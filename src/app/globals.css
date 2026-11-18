@@ -254,3 +254,28 @@ img, svg, video, canvas {
   @page { margin: 16mm; }
 }
 .print-only { display: none; }
+
+/* ── Mascote Mozinha (slime) ─────────────────────────────── */
+@keyframes slime-breathe-kf {
+  0%, 100% { transform: scale(1, 1); }
+  35% { transform: scale(1.045, 0.955); }
+  70% { transform: scale(0.968, 1.045); }
+}
+.slime-breathe {
+  animation: slime-breathe-kf 3.8s ease-in-out infinite;
+  transform-origin: 50% 88%;
+}
+
+@keyframes slime-zzz-kf {
+  0%, 100% { opacity: 0.35; transform: translateY(2px); }
+  50% { opacity: 0.9; transform: translateY(-4px); }
+}
+.slime-zzz {
+  animation: slime-zzz-kf 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slime-breathe, .slime-zzz {
+    animation: none !important;
+  }
+}

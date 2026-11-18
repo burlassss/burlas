@@ -113,6 +113,18 @@ npm start
 - Credenciais **apenas no servidor** — nada de segredos em variáveis `NEXT_PUBLIC_*`
 - RLS ativada no Supabase (sem acesso direto do browser às tabelas; tudo passa pela API com service role)
 
+## Mascote MOZOUT (Mozinha)
+
+Uma pequena gosma verde vive dentro do site — respira, pisca, segue o cursor com os
+olhos, passeia pelo ecrã (sem tapar a bottom nav nem o header), reage ao toque e
+abre um assistente flutuante.
+
+- **Física gelatinosa**: springs de squash & stretch (Framer Motion), arco de salto, sombra de contacto.
+- **Passeio autónomo** com área segura; **olhos acompanham o cursor** (desktop) e **toque** (mobile).
+- **Assistência contextual**: ao 3.º toque num campo, a 12 s parado nele vazio/inválido, ou num erro de validação, aparece um balão discreto e dispensável ("Ajudar-me" abre o assistente com a pergunta certa). Nunca preenche nem submete nada.
+- **Painel de conversa**: base de conhecimento local determinística (`components/slime/slime-kb.ts`) com valores reais da configuração (MT 100 min., taxas, limites, planos). Nada é inventado. Se `SLIME_AI_API_KEY` estiver definido, tenta um endpoint compatível com OpenAI (`SLIME_AI_BASE_URL`/`SLIME_AI_MODEL`) com timeout curto e cai sempre para a base local.
+- **Não aparece** em `/admin` e `/agente`; respeita `prefers-reduced-motion`; sons desligados por omissão; pode ser ocultada pelo utilizador ("Ocultar a Mozinha neste dispositivo", via `localStorage`).
+
 ## Estrutura
 
 ```

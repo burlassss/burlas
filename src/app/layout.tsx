@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/manrope";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
+import { SlimeRoot } from "@/components/slime/slime-root";
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-MZ">
       <body className="min-h-dvh bg-cream text-ink antialiased">
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>{children}<SlimeRoot /></ToastProvider>
       </body>
     </html>
   );
