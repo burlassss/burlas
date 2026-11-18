@@ -30,14 +30,14 @@ export default async function LandingPage() {
         <div aria-hidden className="pointer-events-none absolute -right-40 -top-40 hidden h-[34rem] w-[34rem] rounded-full bg-lime/30 blur-3xl sm:block" />
         <div aria-hidden className="pointer-events-none absolute -left-48 top-64 hidden h-80 w-80 rounded-full bg-forest/10 blur-3xl sm:block" />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-3 pb-12 pt-7 min-[380px]:px-4 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-7 safe-x pb-10 pt-6 min-[380px]:pt-8 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
           <div className="lg:col-span-7">
-            <span className="inline-flex items-center gap-2 rounded-full border border-forest/15 bg-lime-soft px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-forest">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-lime-strong" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-forest/15 bg-lime-soft px-4 py-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-forest">
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-lime-strong" />
               Agora em Moçambique
             </span>
 
-            <h1 className="mt-5 text-[2.28rem] min-[380px]:text-[2.55rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-forest sm:text-6xl lg:text-[4.4rem]">
+            <h1 className="mt-5 text-[1.92rem] min-[380px]:text-[2.28rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-forest sm:text-6xl lg:text-[4.4rem]">
               O teu dinheiro,
               <br />
               <span className="relative inline-block">
@@ -52,19 +52,19 @@ export default async function LandingPage() {
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link href="/criar-conta" className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-forest px-8 text-base font-extrabold text-lime transition-transform hover:-translate-y-0.5">
+              <Link href="/criar-conta" className="group inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-forest px-5 text-center min-[380px]:px-6 sm:w-auto sm:px-8 text-base font-extrabold text-lime transition-transform hover:-translate-y-0.5">
                 Criar a minha conta — é grátis
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
-              <a href="#como-funciona" className="inline-flex h-14 items-center justify-center rounded-full px-6 text-base font-extrabold text-forest underline underline-offset-4 hover:text-moss">
+              <a href="#como-funciona" className="inline-flex h-14 w-full items-center justify-center rounded-full px-5 text-center sm:w-auto sm:px-6 text-base font-extrabold text-forest underline underline-offset-4 hover:text-moss">
                 Ver como funciona
               </a>
             </div>
 
-            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs font-bold text-ink/60">
-              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-forest" /> Dados cifrados AES-256</span>
-              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-forest" /> Ledger imutável e auditável</span>
-              <span className="inline-flex items-center gap-1.5"><Zap className="h-4 w-4 text-forest" /> Cartão ativo na mesma sessão</span>
+            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.68rem] font-bold text-ink/60 min-[380px]:gap-x-5">
+              <span className="inline-flex min-w-0 items-center gap-1.5"><ShieldCheck className="h-4 w-4 shrink-0 text-forest" /> Dados cifrados AES-256</span>
+              <span className="inline-flex min-w-0 items-center gap-1.5"><BadgeCheck className="h-4 w-4 shrink-0 text-forest" /> Ledger imutável e auditável</span>
+              <span className="inline-flex min-w-0 items-center gap-1.5"><Zap className="h-4 w-4 shrink-0 text-forest" /> Cartão ativo na mesma sessão</span>
             </div>
           </div>
 
@@ -127,9 +127,9 @@ export default async function LandingPage() {
       </section>
 
       {/* ── COMO FUNCIONA ────────────────────────────────────── */}
-      <section id="como-funciona" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+      <section id="como-funciona" className="mx-auto max-w-6xl safe-x py-12 min-[380px]:py-14 lg:py-20">
         <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-forest/70">Como funciona</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-forest sm:text-5xl">
+        <h2 className="mt-3 max-w-2xl text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-forest min-[380px]:text-3xl sm:text-5xl">
           Da carteira móvel ao mundo, em três passos.
         </h2>
 
@@ -139,7 +139,7 @@ export default async function LandingPage() {
             { n: "2", t: "Deposita como preferires", d: "USDT TRC20 com confirmação automática, ou M-Pesa / e-Mola via agentes verificados perto de ti.", icon: Wallet },
             { n: "3", t: "Paga em qualquer lugar", d: "O teu cartão virtual é aceite em milhões de lojas online. Congelar? Um toque. CVV? Só tu vês.", icon: Globe2 },
           ].map((passo) => (
-            <div key={passo.n} className="group rounded-3xl border border-black/5 bg-surface p-6 shadow-sm transition-shadow hover:shadow-md">
+            <div key={passo.n} className="group rounded-3xl border border-black/5 bg-surface p-4 shadow-sm min-[380px]:p-6 transition-shadow hover:shadow-md">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest text-lg font-black text-lime">{passo.n}</div>
               <h3 className="mt-4 text-xl font-extrabold tracking-tight text-ink">{passo.t}</h3>
               <p className="mt-2 text-sm font-medium leading-relaxed text-ink/65">{passo.d}</p>
@@ -150,9 +150,9 @@ export default async function LandingPage() {
 
       {/* ── FUNCIONALIDADES ─────────────────────────────────── */}
       <section className="border-t border-black/5 bg-sand/50">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-6xl safe-x py-12 min-[380px]:py-14">
           <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-forest/70">Pensado ao detalhe</p>
-          <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-forest sm:text-5xl">Controlo total, zero surpresas.</h2>
+          <h2 className="mt-3 max-w-2xl text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-forest min-[380px]:text-3xl sm:text-5xl">Controlo total, zero surpresas.</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { icon: Snowflake, t: "Congelar e descongelar", d: "Suspeita de algo? Congela o cartão num toque e descongela quando quiseres." },
@@ -160,7 +160,7 @@ export default async function LandingPage() {
               { icon: ShieldCheck, t: "Ledger imutável", d: "Nenhum saldo é editado — tudo nasce, cresce e termina no lançamento contabilístico." },
               { icon: CircleDollarSign, t: "Dólares, sempre", d: "USD como moeda da carteira. Protege-te da desvalorização do metical." },
             ].map((f) => (
-              <div key={f.t} className="rounded-3xl border border-black/5 bg-surface p-6">
+              <div key={f.t} className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
                 <f.icon className="h-7 w-7 text-forest" strokeWidth={1.8} />
                 <h3 className="mt-3 font-extrabold tracking-tight text-ink">{f.t}</h3>
                 <p className="mt-1.5 text-sm font-medium leading-relaxed text-ink/65">{f.d}</p>
@@ -171,9 +171,9 @@ export default async function LandingPage() {
       </section>
 
       {/* ── PLANOS ──────────────────────────────────────────── */}
-      <section id="planos" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+      <section id="planos" className="mx-auto max-w-6xl safe-x py-12 min-[380px]:py-14 lg:py-20">
         <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-forest/70">Planos de cartão</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-forest sm:text-5xl">Escolhe o teu cartão.</h2>
+        <h2 className="mt-3 max-w-2xl text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-forest min-[380px]:text-3xl sm:text-5xl">Escolhe o teu cartão.</h2>
         <p className="mt-3 max-w-lg font-medium text-ink/65">Ativação única, sem letras pequenas. Limites generosos e CVV sempre visível só para ti.</p>
 
         <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -182,7 +182,7 @@ export default async function LandingPage() {
             return (
               <div
                 key={plano.id}
-                className={`relative flex flex-col rounded-3xl border p-6 transition-transform hover:-translate-y-1 ${
+                className={`relative flex flex-col rounded-3xl border p-4 min-[380px]:p-5 sm:p-6 transition-transform hover:-translate-y-1 ${
                   plano.destaque ? "border-forest bg-forest text-cream shadow-[0_28px_60px_-24px_rgb(22_60_43/0.5)]" : "border-black/5 bg-surface"
                 }`}
               >
@@ -190,10 +190,10 @@ export default async function LandingPage() {
                   <span className="absolute -top-3 right-6 rounded-full bg-lime px-3 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.18em] text-pine shadow">Mais popular</span>
                 )}
                 <Icone className={`h-8 w-8 ${plano.destaque ? "text-lime" : "text-forest"}`} strokeWidth={1.7} />
-                <h3 className="mt-3 text-2xl font-extrabold tracking-tight">{plano.nome}</h3>
+                <h3 className="mt-3 text-[1.35rem] font-extrabold tracking-tight min-[380px]:text-2xl">{plano.nome}</h3>
                 <p className={`mt-1.5 text-sm font-medium leading-snug ${plano.destaque ? "text-cream/80" : "text-ink/60"}`}>{plano.descricao}</p>
                 <div className="mt-5 flex items-end gap-2">
-                  <span className="text-4xl font-extrabold tracking-tight">${plano.taxa_ativacao_usd}</span>
+                  <span className="text-[2rem] font-extrabold tracking-tight min-[380px]:text-4xl">${plano.taxa_ativacao_usd}</span>
                   <span className={`pb-1.5 text-xs font-bold uppercase tracking-wider ${plano.destaque ? "text-cream/60" : "text-ink/50"}`}>
                     ativação{plano.mensalidade_usd > 0 ? ` · $${plano.mensalidade_usd}/mês` : " · sem mensalidade"}
                   </span>
@@ -208,7 +208,7 @@ export default async function LandingPage() {
                 </ul>
                 <Link
                   href="/criar-conta"
-                  className={`mt-6 inline-flex h-12 items-center justify-center rounded-full font-extrabold transition-all ${
+                  className={`mt-6 inline-flex h-12 w-full items-center justify-center rounded-full font-extrabold transition-all ${
                     plano.destaque ? "bg-lime text-pine hover:bg-lime-strong" : "border-2 border-forest text-forest hover:bg-forest hover:text-lime"
                   }`}
                 >
@@ -222,41 +222,41 @@ export default async function LandingPage() {
 
       {/* ── AGENTES ─────────────────────────────────────────── */}
       <section id="agentes" className="border-t border-black/5 bg-pine text-cream">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-12">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 safe-x py-12 min-[380px]:py-14 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-lime/80">Rede de agentes MOZOUT</p>
-            <h2 className="mt-3 text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-lime sm:text-5xl">
+            <h2 className="mt-3 text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-lime min-[380px]:text-3xl sm:text-5xl">
               O M-Pesa e o e-Mola, finalmente ligados ao mundo.
             </h2>
             <p className="mt-4 max-w-lg font-medium leading-relaxed text-cream/75">
               A nossa rede de agentes verificados recebe os teus meticais e credita dólares na tua carteira.
               Distribuição automática, reputação medida a cada operação e disputas resolvidas pela equipa MOZOUT.
             </p>
-            <ul className="mt-6 grid gap-3 text-sm font-semibold text-cream/85 sm:grid-cols-2">
+            <ul className="mt-6 grid gap-3 text-sm font-semibold text-cream/85">
               {["Agentes verificados e avaliados", "Distribuição por desempenho e capacidade", "Comissão e limite diário transparentes", "Disputas arbitradas pela equipa"].map((t) => (
                 <li key={t} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-lime" strokeWidth={3} />{t}</li>
               ))}
             </ul>
-            <Link href="/criar-conta" className="mt-7 inline-flex h-13 items-center gap-2 rounded-full bg-lime px-7 py-4 font-extrabold text-pine hover:bg-lime-strong">
+            <Link href="/criar-conta" className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-lime px-6 sm:w-auto sm:justify-start sm:px-7 font-extrabold text-pine hover:bg-lime-strong">
               Depositar agora <ArrowRight className="h-5 w-5" />
             </Link>
           </div>
           <div className="lg:col-span-5">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-4 min-[380px]:p-6 backdrop-blur">
               <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-lime/80">Exemplo real</p>
-              <div className="mt-3 rounded-2xl bg-cream p-4 text-ink">
+              <div className="mt-3 rounded-2xl bg-cream p-3.5 text-ink min-[380px]:p-4">
                 <p className="text-[0.65rem] font-extrabold uppercase tracking-wider text-ink/50">Transferência para</p>
                 <p className="mt-0.5 font-extrabold">Celso Mondlane · M-Pesa</p>
                 <p className="text-sm font-semibold text-ink/60">+258 84 246 8135 · Maputo — Baixa</p>
-                <div className="mt-3 flex items-center justify-between rounded-xl bg-sand p-3 text-sm font-bold">
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-sand p-3 text-[0.82rem] font-bold">
                   <span>Envias</span>
                   <span>MT 32 000,00</span>
                 </div>
-                <div className="mt-1.5 flex items-center justify-between rounded-xl bg-lime-soft p-3 text-sm font-extrabold text-forest">
+                <div className="mt-1.5 flex items-center justify-between gap-3 rounded-xl bg-lime-soft p-3 text-[0.82rem] font-extrabold text-forest">
                   <span>Recebes</span>
                   <span>$492,50</span>
                 </div>
-                <p className="mt-2 text-center text-[0.62rem] font-bold text-ink/45">Cotação 63,80 · margem já aplicada · ref. DEP-M2411XK9</p>
+                <p className="mt-2 break-words text-center text-[0.62rem] font-bold text-ink/45">Cotação 63,80 · margem já aplicada · ref. DEP-M2411XK9</p>
               </div>
               <div className="mt-4 flex items-center justify-between text-xs font-bold text-cream/60">
                 <span>★ 4,8 · 1 243 operações</span>
@@ -268,22 +268,22 @@ export default async function LandingPage() {
       </section>
 
       {/* ── FAQ ─────────────────────────────────────────────── */}
-      <section id="faq" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section id="faq" className="mx-auto max-w-6xl safe-x py-12 min-[380px]:py-14">
         <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-forest/70">Perguntas frequentes</p>
-        <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.03em] text-forest sm:text-4xl">Tudo sobre o MOZOUT-USD</h2>
+        <h2 className="mt-3 text-[1.75rem] font-extrabold tracking-[-0.03em] text-forest min-[380px]:text-3xl sm:text-4xl">Tudo sobre o MOZOUT-USD</h2>
         <div className="mt-8"><Faq /></div>
       </section>
 
       {/* ── CTA FINAL ───────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-forest px-6 py-14 text-center text-cream sm:px-12">
+      <section className="mx-auto max-w-6xl safe-x pb-12 min-[380px]:pb-16">
+        <div className="relative overflow-hidden rounded-3xl min-[380px]:rounded-[2.5rem] bg-forest px-5 py-12 min-[380px]:px-6 min-[380px]:py-14 text-center text-cream sm:px-12">
           <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-lime/20 blur-3xl" />
           <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-lime/10 blur-3xl" />
-          <h2 className="relative mx-auto max-w-2xl text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+          <h2 className="relative mx-auto max-w-2xl text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.03em] min-[380px]:text-3xl sm:text-5xl">
             O mundo não espera pelo teu cartão. <span className="text-lime">Nem devia.</span>
           </h2>
           <p className="relative mx-auto mt-4 max-w-md font-medium text-cream/75">Abre a tua conta em menos de dois minutos e recebe o cartão na mesma sessão.</p>
-          <Link href="/criar-conta" className="relative mt-7 inline-flex h-14 items-center gap-2 rounded-full bg-lime px-9 text-base font-extrabold text-pine transition-transform hover:-translate-y-0.5 hover:bg-lime-strong">
+          <Link href="/criar-conta" className="relative mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-lime px-6 min-[380px]:w-auto text-base font-extrabold text-pine transition-transform hover:-translate-y-0.5 hover:bg-lime-strong">
             Criar a minha conta <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
@@ -291,13 +291,13 @@ export default async function LandingPage() {
 
       {/* ── FOOTER ──────────────────────────────────────────── */}
       <footer className="border-t border-black/5 bg-cream">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-6xl safe-x py-10 sm:py-12">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-start">
             <div>
               <Logo />
               <p className="mt-3 max-w-xs text-sm font-medium text-ink/60">A carteira digital em dólares feita para Moçambique. Paga ao mundo, recebe do mundo.</p>
             </div>
-            <div className="grid grid-cols-2 gap-10 text-sm font-semibold sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 text-sm font-semibold min-[380px]:grid-cols-2 sm:grid-cols-3 sm:gap-10">
               <div>
                 <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-ink/45">Produto</p>
                 <ul className="mt-2 space-y-1.5"><li><a href="#planos" className="hover:text-forest">Cartões</a></li><li><a href="#agentes" className="hover:text-forest">Rede de agentes</a></li><li><a href="#como-funciona" className="hover:text-forest">Como funciona</a></li></ul>
@@ -312,7 +312,7 @@ export default async function LandingPage() {
               </div>
             </div>
           </div>
-          <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-black/5 pt-6 text-xs font-semibold text-ink/45 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-black/5 pt-6 text-xs font-semibold text-ink/45 sm:flex-row sm:items-center">
             <p>© 2026 MOZOUT-USD, S.A. · Maputo, Moçambique</p>
             <p>Licenciado pelo Banco de Moçambique · PCI-DSS</p>
           </div>
