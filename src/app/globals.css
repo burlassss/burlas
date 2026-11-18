@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  /* MOZOUT-USD — identidade própria inspirada nas fintech internacionais */
+  --color-cream: #f6f6f2;
+  --color-surface: #ffffff;
+  --color-ink: #121f16;
+  --color-forest: #163c2b;
+  --color-moss: #1e4d38;
+  --color-pine: #0f2a1d;
+  --color-lime: #a9f44d;
+  --color-lime-strong: #8fe32f;
+  --color-lime-soft: #e9ffd9;
+  --color-mist: #e9eae4;
+  --color-sand: #efefe9;
+  --color-gold: #f2c14e;
+
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --shadow-card: 0 1px 2px rgb(18 31 22 / 0.06), 0 12px 32px -12px rgb(18 31 22 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(18 31 22 / 0.08), 0 24px 48px -16px rgb(18 31 22 / 0.28);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-pine);
+}
+
+/* ── Cartão virtual premium ─────────────────────────────── */
+.card-texture {
+  background:
+    radial-gradient(1200px 500px at 120% -10%, rgb(169 244 77 / 0.22), transparent 55%),
+    radial-gradient(900px 500px at -20% 120%, rgb(82 196 128 / 0.18), transparent 55%),
+    linear-gradient(135deg, #1c4630 0%, #163c2b 38%, #0f2a1d 100%);
+}
+.card-texture-purple {
+  background:
+    radial-gradient(1000px 480px at 115% -15%, rgb(178 154 255 / 0.3), transparent 55%),
+    radial-gradient(800px 500px at -15% 115%, rgb(108 99 255 / 0.35), transparent 55%),
+    linear-gradient(135deg, #26264a 0%, #1b1b3a 45%, #101024 100%);
+}
+.card-texture-gold {
+  background:
+    radial-gradient(1000px 480px at 115% -15%, rgb(242 193 78 / 0.4), transparent 55%),
+    radial-gradient(800px 500px at -15% 115%, rgb(255 140 66 / 0.28), transparent 55%),
+    linear-gradient(135deg, #2e2010 0%, #1f150a 45%, #120b05 100%);
+}
+.card-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ── Marquee ────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 36s linear infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(110deg, #ecece7 30%, #f7f7f4 45%, #ecece7 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* ── Focus acessível ────────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid rgb(169 244 77 / 0.7);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── Scrollbar discreta ─────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c9c9c2 transparent;
+}
+
+/* ── Impressão (extrato em PDF via print) ───────────────── */
+@media print {
+  body { background: #fff; }
+  .print-hidden { display: none !important; }
+  .print-only { display: block !important; }
+  @page { margin: 16mm; }
+}
+.print-only { display: none; }
