@@ -39,13 +39,13 @@ export function Faq() {
         <div key={i}>
           <button
             onClick={() => setAberta((v) => (v === i ? -1 : i))}
-            className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left"
+            className="flex w-full items-center justify-between gap-4 px-4 py-4 min-[380px]:gap-6 min-[380px]:px-6 min-[380px]:py-5 text-left"
             aria-expanded={aberta === i}
           >
             <span className="text-[0.97rem] font-extrabold tracking-tight text-ink">{item.q}</span>
             <Plus className={cn("h-5 w-5 shrink-0 text-forest transition-transform duration-300", aberta === i && "rotate-45")} />
           </button>
-          {aberta === i && <div className="px-6 pb-5 text-sm font-medium leading-relaxed text-ink/70">{item.a}</div>}
+          {aberta === i && <div className="px-4 pb-5 min-[380px]:px-6 text-sm font-medium leading-relaxed text-ink/70">{item.a}</div>}
         </div>
       ))}
     </div>
