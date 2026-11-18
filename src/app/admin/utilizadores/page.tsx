@@ -29,7 +29,7 @@ export default async function AdminUtilizadoresPage({ searchParams }: { searchPa
       </div>
 
       {utilizadores.length === 0 ? (
-        <EmptyState icon={Users} title="Sem resultados" description="Nenhum utilizador corresponde à pesquisa." />
+        <EmptyState icon={<Users className="h-6 w-6 text-forest" />} title="Sem resultados" description="Nenhum utilizador corresponde à pesquisa." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-black/5 bg-surface shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">

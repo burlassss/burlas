@@ -22,7 +22,7 @@ export default async function AdminNotificacoesPage() {
       </div>
 
       {notificacoes.length === 0 ? (
-        <EmptyState icon={BellRing} title="Sem notificações" description="Os disparos de OTP, alertas e avisos aparecem aqui." />
+        <EmptyState icon={<BellRing className="h-6 w-6 text-forest" />} title="Sem notificações" description="Os disparos de OTP, alertas e avisos aparecem aqui." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-black/5 bg-surface shadow-sm">
           <table className="w-full min-w-[860px] text-left text-sm">

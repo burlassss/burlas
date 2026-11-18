@@ -34,7 +34,7 @@ export default async function AdminDisputasPage() {
       </div>
 
       {disputas.length === 0 ? (
-        <EmptyState icon={Scale} title="Sem disputas" description="Ninguém abriu uma disputa. Quando acontecer, aparece aqui para mediação." />
+        <EmptyState icon={<Scale className="h-6 w-6 text-forest" />} title="Sem disputas" description="Ninguém abriu uma disputa. Quando acontecer, aparece aqui para mediação." />
       ) : (
         <div className="flex flex-col gap-3">
           {disputas.map((d) => {

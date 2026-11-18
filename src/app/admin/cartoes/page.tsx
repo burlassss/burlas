@@ -26,7 +26,7 @@ export default async function AdminCartoesPage() {
       </div>
 
       {cartoes.length === 0 ? (
-        <EmptyState icon={CreditCard} title="Sem cartões emitidos" description="Assim que um cliente pagar a taxa de ativação, o cartão aparece aqui." />
+        <EmptyState icon={<CreditCard className="h-6 w-6 text-forest" />} title="Sem cartões emitidos" description="Assim que um cliente pagar a taxa de ativação, o cartão aparece aqui." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-black/5 bg-surface shadow-sm">
           <table className="w-full min-w-[860px] text-left text-sm">

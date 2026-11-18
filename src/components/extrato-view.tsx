@@ -162,7 +162,7 @@ export function ExtratoView({ nome, itens }: { nome: string; itens: ExtratoItem[
 
       {/* Movimentos */}
       {filtrados.length === 0 ? (
-        <EmptyState icon={FileText} title="Sem movimentos" description="Ainda não há movimentos deste tipo. Quando fizeres um depósito ou compra, aparece tudo aqui." />
+        <EmptyState icon={<FileText className="h-6 w-6 text-forest" />} title="Sem movimentos" description="Ainda não há movimentos deste tipo. Quando fizeres um depósito ou compra, aparece tudo aqui." />
       ) : (
         grupos.map(([grupo, items]) => (
           <section key={grupo} aria-label={grupo}>

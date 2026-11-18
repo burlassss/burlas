@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, CreditCard, FileText, LifeBuoy, Plus, ArrowDownToLine, ArrowUpRight, Receipt } from "lucide-react";
+
+function safeUltimos4(numero: string): string {
+  try { return decryptSecret(numero).slice(-4); } catch { return "••••"; }
+}
+import { ArrowRight, CreditCard, FileText, LifeBuoy, ArrowDownToLine, ArrowUpRight, Receipt } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { dataMode } from "@/lib/db";
@@ -7,10 +11,10 @@ import { decryptSecret } from "@/lib/crypto";
 import { cotacao } from "@/lib/services/fx";
 import { formatDataHora, formatMoeda, fromCents } from "@/lib/money";
 import { TIPO_MOVIMENTO } from "@/lib/labels";
-import { WalletPanel } from "@/components/wallet-panel";
-import { CardSection } from "@/components/card-section";
+import { CarteiraHero } from "@/components/carteira-hero";
 import { MovimentoIcon } from "@/components/movimento";
 import { Badge } from "@/components/ui";
+import { ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +32,7 @@ export default async function PainelPage() {
 
   const card = cards[0] ?? null;
   const plan = card ? await db.findPlan(card.plan_id) : null;
+  const ultimos4 = card ? safeUltimos4(card.numero) : "0000";
 
   // Gasto do mês corrente (compras) para a barra de limite
   const mesAtual = new Date().toISOString().slice(0, 7);
@@ -56,34 +61,25 @@ export default async function PainelPage() {
         )}
       </div>
 
-      {/* Carteira + Cartão */}
-      <div className="grid gap-5 lg:grid-cols-2">
-        <WalletPanel saldoCents={saldoCents} reservadoCents={reservadoCents} mznEquivalente={mznEquivalente} cotacao={cx.valorEfetivo} margemPct={cx.margemPct} />
-        {card ? (
-          <CardSection
-            cartao={{
-              id: card.id,
-              planNome: plan?.nome ?? "Cartão MOZOUT",
-              tipo: plan?.tipo ?? "compras",
-              estado: card.estado,
-              validade: card.validade,
-              limiteMensal: card.limite_mensal,
-              gastosMesCents: gastoMesCents,
-              ultimos4: decryptSecret(card.numero).slice(-4),
-              titular: card.titular,
-            }}
-          />
-        ) : (
-          <section className="flex flex-col items-center justify-center gap-3 rounded-[1.75rem] border-2 border-dashed border-mist bg-surface/60 p-8 text-center">
-            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sand"><CreditCard className="h-8 w-8 text-forest" strokeWidth={1.6} /></span>
-            <h2 className="text-xl font-extrabold tracking-tight text-ink">Ainda não tens cartão</h2>
-            <p className="max-w-xs text-sm font-medium text-ink/55">Escolhe um plano e recebe o teu cartão virtual VISA na mesma sessão.</p>
-            <Link href="/cartoes" className="mt-1 inline-flex h-12 items-center gap-2 rounded-full bg-forest px-6 font-extrabold text-lime hover:bg-moss">
-              <Plus className="h-5 w-5" /> Pedir cartão
-            </Link>
-          </section>
-        )}
-      </div>
+      {/* Carteira: cartão premium 3D + saldo, câmbio e gastos */}
+      <CarteiraHero
+        saldoCents={saldoCents}
+        reservadoCents={reservadoCents}
+        mznEquivalente={mznEquivalente}
+        cotacao={cx.valorEfetivo}
+        margemPct={cx.margemPct}
+        cartao={card ? {
+          id: card.id,
+          planNome: plan?.nome ?? "Cartão MOZOUT",
+          tipo: plan?.tipo ?? "compras",
+          estado: card.estado,
+          validade: card.validade,
+          limiteMensal: card.limite_mensal,
+          gastosMesCents: gastoMesCents,
+          ultimos4,
+          titular: card.titular,
+        } : null}
+      />
 
       {/* Ações rápidas */}
       <nav className="grid grid-cols-4 gap-2 sm:gap-3" aria-label="Ações rápidas">
@@ -151,10 +147,13 @@ export default async function PainelPage() {
             </div>
           </div>
           <div className="rounded-[1.75rem] border border-black/5 bg-surface p-5 shadow-sm">
-            <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-ink/45">Cotação aplicada</p>
-            <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-forest">1 USD = MT {cx.valorEfetivo.toFixed(2)}</p>
-            <p className="mt-0.5 text-[0.7rem] font-semibold text-ink/50">Base {cx.valor.toFixed(2)} · margem {cx.margemPct.toFixed(2)}% · atualizada hoje</p>
-            <Link href="/depositar" className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-forest hover:text-moss">Depositar com esta cotação <ArrowRight className="h-3.5 w-3.5" /></Link>
+            <ShieldCheck className="h-6 w-6 text-forest" strokeWidth={1.8} />
+            <h3 className="mt-2 font-extrabold tracking-tight text-ink">Segurança em primeiro lugar</h3>
+            <ul className="mt-2 space-y-1.5 text-xs font-medium leading-relaxed text-ink/60">
+              <li>· Nunca partilhes o CVV — nem connosco</li>
+              <li>· Congela o cartão connosco em 1 toque se pertas o telemóvel</li>
+              <li>· Enviámos SMS em cada operação — confirma sempre</li>
+            </ul>
           </div>
         </aside>
       </div>

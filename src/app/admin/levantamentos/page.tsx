@@ -53,7 +53,7 @@ export default async function AdminLevantamentosPage({ searchParams }: { searchP
       </div>
 
       {lista.length === 0 ? (
-        <EmptyState icon={ArrowUpRight} title="Nada por aqui" description="Nenhum levantamento neste filtro." />
+        <EmptyState icon={<ArrowUpRight className="h-6 w-6 text-forest" />} title="Nada por aqui" description="Nenhum levantamento neste filtro." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-black/5 bg-surface shadow-sm">
           <table className="w-full min-w-[920px] text-left text-sm">

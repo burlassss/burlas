@@ -54,7 +54,7 @@ export default async function AdminDepositosPage({ searchParams }: { searchParam
       </div>
 
       {depositos.length === 0 ? (
-        <EmptyState icon={ArrowDownToLine} title="Nada por aqui" description="Nenhum depósito neste estado neste momento." />
+        <EmptyState icon={<ArrowDownToLine className="h-6 w-6 text-forest" />} title="Nada por aqui" description="Nenhum depósito neste estado neste momento." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-black/5 bg-surface shadow-sm">
           <table className="w-full min-w-[880px] text-left text-sm">

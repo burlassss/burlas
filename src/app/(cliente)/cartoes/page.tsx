@@ -43,7 +43,7 @@ export default async function CartoesPage() {
         estado: c.estado,
         validade: c.validade,
         limite_mensal: c.limite_mensal,
-        ultimos4: decryptSecret(c.numero).slice(-4),
+        ultimos4: (() => { try { return decryptSecret(c.numero).slice(-4); } catch { return "••••"; } })(),
         titular: c.titular,
       };
     }),

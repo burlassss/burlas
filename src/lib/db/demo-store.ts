@@ -26,9 +26,7 @@ import type {
   Withdrawal,
   WithdrawalFilter,
 } from "./types";
-import { centsToDb, dbToCents, fromCents, referencia } from "../money";
-import { gerarNumeroCartao } from "../luhn";
-import { encryptSecret } from "../crypto";
+import { centsToDb, fromCents, referencia } from "../money";
 
 interface DBData {
   users: User[];
@@ -51,7 +49,6 @@ interface DBData {
 }
 
 const agora = () => new Date().toISOString();
-const isoEm = (minutos: number) => new Date(Date.now() + minutos * 60_000).toISOString();
 const isoHa = (minutos: number) => new Date(Date.now() - minutos * 60_000).toISOString();
 const uuid = () => crypto.randomUUID();
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
@@ -67,12 +64,13 @@ function u(parcial: Omit<User, "id" | "criado_em" | "password_hash"> & { passwor
 }
 
 function seed(): DBData {
+  // ── Avaliação local, sem dados fictícios ─────────────────────────────
+  // Apenas o necessário para avaliar a plataforma: um superadmin e dois
+  // agentes de avaliação, com histórico zerado (nenhuma operação/avalição).
+  // Nenhuma transação, saldo, cartão, disputa ou notificação é pré-carregada.
   const admin = u({ nome: "Administrador Geral", email: "admin@mozout.co.mz", telefone: "+258840000001", nascimento: "1990-01-01", password: "Mozout#Admin2026", estado: "ativo", telefone_verificado: true, papel: "superadmin" });
-  const suporte = u({ nome: "Equipa de Suporte", email: "suporte@mozout.co.mz", telefone: "+258840000002", nascimento: "1993-05-11", password: "Mozout#Suporte2026", estado: "ativo", telefone_verificado: true, papel: "suporte" });
-  const maria = u({ nome: "Maria Fernandes", email: "maria@example.com", telefone: "+258841234567", nascimento: "1996-03-22", password: "Cliente#123", estado: "ativo", telefone_verificado: true, papel: "cliente" });
-  const joao = u({ nome: "João Machava", email: "joao@example.com", telefone: "+258857654321", nascimento: "2001-07-30", password: "Cliente#123", estado: "ativo", telefone_verificado: true, papel: "cliente" });
-  const agenteMpesaUser = u({ nome: "Celso Mondlane", email: "agente.mpesa@example.com", telefone: "+258842468135", nascimento: "1988-11-05", password: "Agente#123", estado: "ativo", telefone_verificado: true, papel: "agente" });
-  const agenteEmolaUser = u({ nome: "Berta Tembe", email: "agente.emola@example.com", telefone: "+258863579246", nascimento: "1991-02-14", password: "Agente#123", estado: "ativo", telefone_verificado: true, papel: "agente" });
+  const agenteMpesaUser = u({ nome: "Agente M-Pesa (avaliação)", email: "agente.mpesa@example.com", telefone: "+258842468135", nascimento: "1990-01-01", password: "Agente#123", estado: "ativo", telefone_verificado: true, papel: "agente" });
+  const agenteEmolaUser = u({ nome: "Agente e-Mola (avaliação)", email: "agente.emola@example.com", telefone: "+258863579246", nascimento: "1990-01-01", password: "Agente#123", estado: "ativo", telefone_verificado: true, papel: "agente" });
 
   const plans: Plan[] = [
     {
@@ -82,7 +80,7 @@ function seed(): DBData {
       limite_gasto_usd: 2000, limite_carga_usd: 5000, validade_meses: 36, ordem: 1, ativo: true, destaque: true,
       cor: "from-[#101f16] via-[#173a29] to-[#0b241a]", icone: "shopping-bag",
       beneficios: ["Aceite em milhões de lojas online", "3-D Secure e alertas em tempo real", "Congelar e descongelar quando quiseres", "CVV dinâmico por compra"],
-      criado_em: isoHa(60 * 24 * 200),
+      criado_em: agora(),
     },
     {
       id: uuid(), nome: "Assinaturas", slug: "assinaturas", tipo: "assinaturas",
@@ -91,7 +89,7 @@ function seed(): DBData {
       limite_gasto_usd: 1000, limite_carga_usd: 3000, validade_meses: 24, ordem: 2, ativo: true, destaque: false,
       cor: "from-[#141425] via-[#232147] to-[#0e0e20]", icone: "repeat",
       beneficios: ["Ideal para Netflix, Spotify, OpenAI, Google Ads", "Débito recorrente sem fricção", "Limites por comerciante configuráveis", "Reembolso automático de cobranças indevidas"],
-      criado_em: isoHa(60 * 24 * 200),
+      criado_em: agora(),
     },
     {
       id: uuid(), nome: "Viagem", slug: "viagem", tipo: "viagem",
@@ -100,19 +98,17 @@ function seed(): DBData {
       limite_gasto_usd: 5000, limite_carga_usd: 10000, validade_meses: 60, ordem: 3, ativo: true, destaque: false,
       cor: "from-[#1c130b] via-[#3a2712] to-[#241408]", icone: "plane",
       beneficios: ["Sem mensalidade para sempre", "Multi-moeda na mesma carteira", "Cobertura internacional completa", "Seguro de compra incluído"],
-      criado_em: isoHa(60 * 24 * 200),
+      criado_em: agora(),
     },
   ];
 
-  const planCompras = plans[0];
-
   const agents: Agent[] = [
-    { id: uuid(), user_id: agenteMpesaUser.id, operadora: "mpesa", limite_diario: 2500, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 4.8, total_operacoes: 1243, operacoes_concluidas: 1201, tempo_resposta_min: 4, localizacao: "Maputo — Baixa", criado_em: isoHa(60 * 24 * 160) },
-    { id: uuid(), user_id: agenteEmolaUser.id, operadora: "emola", limite_diario: 2000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 4.6, total_operacoes: 874, operacoes_concluidas: 831, tempo_resposta_min: 6, localizacao: "Matola — Fomento", criado_em: isoHa(60 * 24 * 140) },
+    { id: uuid(), user_id: agenteMpesaUser.id, operadora: "mpesa", limite_diario: 1000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 0, total_operacoes: 0, operacoes_concluidas: 0, tempo_resposta_min: 5, localizacao: null, criado_em: agora() },
+    { id: uuid(), user_id: agenteEmolaUser.id, operadora: "emola", limite_diario: 1000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 0, total_operacoes: 0, operacoes_concluidas: 0, tempo_resposta_min: 5, localizacao: null, criado_em: agora() },
   ];
 
   const rates: Rate[] = [
-    { id: uuid(), par: "USD/MZN", valor: 63.8, margem: 1.5, criado_por: admin.id, criado_em: isoHa(60 * 5) },
+    { id: uuid(), par: "USD/MZN", valor: 63.8, margem: 1.5, criado_por: admin.id, criado_em: agora() },
   ];
 
   const fees: Fee[] = [
@@ -134,8 +130,8 @@ function seed(): DBData {
     { chave: "limite_levantamento_dia_usd", valor: "3000" },
   ];
 
-  const data: DBData = {
-    users: [admin, suporte, maria, joao, agenteMpesaUser, agenteEmolaUser],
+  return {
+    users: [admin, agenteMpesaUser, agenteEmolaUser],
     sessions: [],
     smsCodes: [],
     plans,
@@ -153,107 +149,6 @@ function seed(): DBData {
     disputes: [],
     audit: [],
   };
-
-  // ── Lançamentos históricos da Maria (fonte de verdade do saldo) ──
-  const ap = (input: Omit<ApplyLedgerInput, "referencia"> & { referencia: string }, minutosAtras: number) => {
-    const current = data.ledger.reduce((acc, e) => acc + dbToCents(e.valor), 0);
-    const novo = current + input.valorCents;
-    data.ledger.push({
-      id: uuid(),
-      user_id: input.userId,
-      tipo: input.tipo,
-      valor: fromCents(input.valorCents),
-      moeda: input.moeda ?? "USD",
-      rate_id: input.rateId ?? null,
-      referencia: input.referencia,
-      estado: input.estado ?? "confirmado",
-      descricao: input.descricao,
-      saldo_resultante: fromCents(novo),
-      criado_em: isoHa(minutosAtras),
-    });
-  };
-
-  ap({ userId: maria.id, tipo: "deposito", valorCents: 50000, referencia: "SEED-DEP-001", descricao: "Depósito USDT TRC20" }, 60 * 24 * 60);
-  ap({ userId: maria.id, tipo: "ativacao_cartao", valorCents: -1000, referencia: "SEED-CARD-001", descricao: "Ativação do cartão Compras Online", rateId: null }, 60 * 24 * 59);
-  ap({ userId: maria.id, tipo: "deposito", valorCents: 75000, referencia: "SEED-DEP-002", descricao: "Depósito M-Pesa · via Celso Mondlane" }, 60 * 24 * 30);
-  ap({ userId: maria.id, tipo: "compra", valorCents: -12999, referencia: "SEED-BUY-001", descricao: "NETFLIX.COM 866-579-7172" }, 60 * 24 * 21);
-  ap({ userId: maria.id, tipo: "taxa", valorCents: -250, referencia: "SEED-FEE-001", descricao: "Taxa de levantamento" }, 60 * 24 * 20);
-  ap({ userId: maria.id, tipo: "compra", valorCents: -5998, referencia: "SEED-BUY-002", descricao: "SPOTIFY AB" }, 60 * 24 * 12);
-  ap({ userId: maria.id, tipo: "reembolso", valorCents: 5998, referencia: "SEED-REF-001", descricao: "Estorno — compra recusada SPOTIFY AB" }, 60 * 24 * 11);
-  ap({ userId: maria.id, tipo: "compra", valorCents: -25000, referencia: "SEED-BUY-003", descricao: "AMAZON MARKETPLACE" }, 60 * 24 * 6);
-  ap({ userId: maria.id, tipo: "mensalidade", valorCents: -250, referencia: "SEED-FEE-002", descricao: "Mensalidade do cartão Compras Online" }, 60 * 24 * 2);
-  ap({ userId: maria.id, tipo: "deposito", valorCents: 12000, referencia: "SEED-DEP-003", descricao: "Depósito e-Mola · via Berta Tembe" }, 60 * 8);
-
-  ap({ userId: joao.id, tipo: "deposito", valorCents: 20000, referencia: "SEED-DEP-J001", descricao: "Depósito USDT TRC20" }, 60 * 24 * 10);
-  ap({ userId: joao.id, tipo: "ativacao_cartao", valorCents: -500, referencia: "SEED-CARD-J001", descricao: "Ativação do cartão Assinaturas" }, 60 * 24 * 9);
-
-  // ── Cartão da Maria ────────────────────────────────────────
-  const numeroMaria = gerarNumeroCartao("4539");
-  data.cards.push({
-    id: uuid(), user_id: maria.id, plan_id: planCompras.id,
-    numero: encryptSecret(numeroMaria), validade: "09/29", cvv: encryptSecret(String(Math.floor(100 + Math.random() * 900))),
-    titular: maria.nome.toUpperCase(), estado: "ativo", limite_mensal: planCompras.limite_gasto_usd, criado_em: isoHa(60 * 24 * 59),
-  });
-
-  // ── Depósito pendente em análise (admin) ───────────────────
-  const depPendente: Deposit = {
-    id: uuid(), user_id: joao.id, metodo: "mpesa", valor_mzn: 32000, valor_usd: 500, valor_liquido_usd: 492.5,
-    codigo_tx: "MP2411XK92", rate_id: rates[0].id, comissao: 5, taxa: 2.5, agent_id: agents[0].id,
-    estado: "pendente_analise", motivo_recusa: null, referencia: "DEP-M2411XK9", provedor_ref: null, endereco_pagamento: null,
-    criado_em: isoHa(38), decidido_em: null,
-  };
-  data.deposits.push(depPendente);
-
-  const depCrypto: Deposit = {
-    id: uuid(), user_id: maria.id, metodo: "usdt_trc20", valor_mzn: null, valor_usd: 250, valor_liquido_usd: 248.75,
-    codigo_tx: null, rate_id: null, comissao: 0, taxa: 1.25, agent_id: null,
-    estado: "aguardando_pagamento", motivo_recusa: null, referencia: "DEP-T2411C71", provedor_ref: "demo-nowpayments-7712", endereco_pagamento: "TXYZDEMOMOZOUT7RC2025COPA9KQ3LM2",
-    criado_em: isoHa(12), decidido_em: null,
-  };
-  data.deposits.push(depCrypto);
-
-  // ── Levantamento pendente de confirmação ───────────────────
-  const lev1: Withdrawal = {
-    id: uuid(), user_id: maria.id, metodo: "mpesa", valor_usd: 100, valor_mzn: 6380, valor_liquido_mzn: 6338,
-    taxa: 2.5, comissao: 1, destino: "+258841234567", rate_id: rates[0].id, agent_id: agents[0].id,
-    referencia: "LEV-M2411QW3", codigo_tx: "MP77451ZX", estado: "aguardando_confirmacao", observacoes: null,
-    criado_em: isoHa(95), concluida_em: null,
-  };
-  data.withdrawals.push(lev1);
-
-  // ── Ordens pendentes para o agente M-Pesa ──────────────────
-  data.orders.push(
-    { id: uuid(), agent_id: agents[0].id, tipo: "deposito", referencia_id: depPendente.id, estado: "pendente", expira_em: isoEm(15), criado_em: isoHa(38), aceite_em: null, concluida_em: null },
-    { id: uuid(), agent_id: agents[0].id, tipo: "levantamento", referencia_id: lev1.id, estado: "aceite", expira_em: isoEm(45), criado_em: isoHa(100), aceite_em: isoHa(96), concluida_em: null },
-  );
-
-  // ── Notificações da Maria ──────────────────────────────────
-  const notif = (tipo: string, titulo: string, corpo: string, canal: Notification["canal"], minutosAtras: number, lida = false): Notification => ({
-    id: uuid(), user_id: maria.id, tipo, canal, titulo, corpo,
-    estado: lida ? "lida" : canal === "sms" ? "enviada" : "enviada",
-    criado_em: isoHa(minutosAtras), lido_em: lida ? isoHa(minutosAtras - 2) : null,
-  });
-  data.notifications.push(
-    notif("deposito_aprovado", "Depósito aprovado", "O teu depósito de $120.00 via e-Mola foi confirmado e creditado na carteira.", "in_app", 60 * 8),
-    notif("cartao_emitido", "Cartão Compras Online ativo", "O teu cartão virtual foi emitido e já pode ser usado em compras internacionais.", "in_app", 60 * 24 * 59, true),
-    notif("seguranca", "Novo dispositivo detetado", "Iniciaste sessão num novo dispositivo Android em Maputo. Se não foste tu, altera a tua palavra-passe.", "in_app", 60 * 26),
-    notif("codigo_verificacao", "Código de verificação", "O teu código MOZOUT é 482913. Expira em 5 minutos.", "sms", 60 * 24 * 190, true),
-    notif("levantamento_concluido", "Levantamento $100 em curso", "O agente Celso enviou MT 6 338 para o teu M-Pesa. Confirma a receção na app.", "in_app", 95),
-  );
-
-  // ── Disputa aberta ─────────────────────────────────────────
-  data.disputes.push({
-    id: uuid(), referencia_id: lev1.id, tipo: "levantamento_nao_recebido", user_id: maria.id, agent_id: agents[0].id,
-    estado: "aberta", resolucao: null, detalhes: "O agente marcou como enviado mas o M-Pesa não recebeu a transferência.", criado_em: isoHa(30), resolvida_em: null,
-  });
-
-  // ── Auditoria inicial ──────────────────────────────────────
-  data.audit.push(
-    { id: uuid(), ator: admin.id, acao: "taxa.alterada", entidade: "fees", entidade_id: null, dados: { chave: "deposito_mpesa_pct", valor: 1.5 }, criado_em: isoHa(60 * 5) },
-    { id: uuid(), ator: null, acao: "deposito.criado", entidade: "deposits", entidade_id: depCrypto.id, dados: { metodo: "usdt_trc20", valor: 250 }, criado_em: isoHa(12) },
-  );
-
-  return data;
 }
 
 interface GlobalWithSeed {
