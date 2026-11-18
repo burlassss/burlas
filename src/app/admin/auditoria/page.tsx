@@ -21,7 +21,7 @@ export default async function AdminAuditoriaPage() {
       </div>
 
       {registos.length === 0 ? (
-        <EmptyState icon={ScrollText} title="Sem registos" description="As ações administrativas ficam gravadas aqui automaticamente." />
+        <EmptyState icon={<ScrollText className="h-6 w-6 text-forest" />} title="Sem registos" description="As ações administrativas ficam gravadas aqui automaticamente." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-black/5 bg-surface shadow-sm">
           <table className="w-full min-w-[860px] text-left text-sm">

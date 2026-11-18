@@ -35,16 +35,15 @@ npm install
 npm run dev     # http://localhost:3000
 ```
 
-**Contas de demonstração**
+Modo demonstração **sem dados fictícios**: nenhuma transação, saldo, cartão ou avaliação é pré-carregada — tudo começa do zero. Para avaliar, há apenas contas de avaliação zeradas:
 
 | Papel | E-mail | Palavra-passe |
 |---|---|---|
 | Superadministrador | `admin@mozout.co.mz` | `Mozout#Admin2026` |
-| Suporte | `suporte@mozout.co.mz` | `Mozout#Suporte2026` |
-| Cliente | `maria@example.com` | `Cliente#123` |
-| Cliente | `joao@example.com` | `Cliente#123` |
 | Agente M-Pesa | `agente.mpesa@example.com` | `Agente#123` |
 | Agente e-Mola | `agente.emola@example.com` | `Agente#123` |
+
+Regista a tua própria conta de cliente e vais ver a plataforma do zero. A produção (`supabase/seed.sql`) não contém nenhuma conta nem movimento — ver bloco de bootstrap no próprio ficheiro. Para um ambiente de avaliação Supabase com as contas zeradas, usa `supabase/seed.demo.sql`.
 
 ---
 
@@ -55,7 +54,7 @@ npm run dev     # http://localhost:3000
 1. Cria um projecto em [supabase.com](https://supabase.com)
 2. No **SQL Editor**, executa por ordem:
    - `supabase/migrations/0001_init.sql` — 17 tabelas, índices, constraints, RLS e a função `apply_ledger` (lançamento atómico e idempotente)
-   - `supabase/seed.sql` — planos de cartões, taxas, cotação USD/MZN e contas de demonstração (**altera as passwords em produção!**)
+   - `supabase/seed.sql` — **apenas configuração** (planos, taxas, cotação); sem contas nem movimentos — segue o bloco de bootstrap no ficheiro para criares o primeiro admin
 3. Em **Project Settings → API**, copia: `URL`, `anon key` e `service_role key`
 
 ### 2. Configurar variáveis de ambiente
@@ -142,5 +141,5 @@ supabase/
 ## Notas & honestidade técnica
 
 - Os SMS e pagamentos em modo demonstração são simulados para permitir homologação sem terceiros. Antes de produção, preenche as chaves e executa o checklist em `/admin/integracoes`.
-- O seed inclui contas e passwords de demonstração — **muda-as** antes de qualquer exposição pública.
+- O modo demo inclui contas de avaliação zeradas com passwords públicas — usa-as só para avaliação local; nunca as recries em produção (o `seed.sql` não as cria).
 - `npm audit` reporta vulnerabilidades transitivas; as versões directas (Next 16, React 19) estão pinadas de propósito.

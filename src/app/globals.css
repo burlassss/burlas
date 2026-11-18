@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -31,6 +32,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -106,6 +108,100 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: #c9c9c2 transparent;
+}
+
+/* ── 3D: cartão premium ─────────────────────────────────── */
+.persp-1200 { perspective: 1200px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.rotate-y-180 { transform: rotateY(180deg); }
+
+@keyframes card-idle {
+  0%, 100% { transform: translateY(0) rotateX(3deg) rotateY(-7deg); }
+  50% { transform: translateY(-12px) rotateX(-2deg) rotateY(8deg); }
+}
+.animate-card-idle {
+  animation: card-idle 7s ease-in-out infinite;
+}
+
+@keyframes shine-sweep {
+  from { transform: translateX(-130%) skewX(-18deg); }
+  to { transform: translateX(230%) skewX(-18deg); }
+}
+.animate-shine {
+  animation: shine-sweep 4.2s ease-in-out infinite;
+}
+
+/* ── Radar: procurar agente ─────────────────────────────── */
+@keyframes radar-ping {
+  0% { transform: scale(0.45); opacity: 0.9; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.animate-radar {
+  animation: radar-ping 2.4s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-radar-sweep {
+  animation: radar-sweep 2.8s linear infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.72; transform: scale(0.965); }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+/* ── Burst: sucesso (agente encontrado / recebido) ──────── */
+@keyframes burst-ring {
+  0% { transform: scale(0.4); opacity: 1; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+.animate-burst-ring {
+  animation: burst-ring 0.9s cubic-bezier(0.17, 0.89, 0.32, 1.27) forwards;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop-in {
+  animation: pop-in 0.55s cubic-bezier(0.17, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes rise-in {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-rise-in {
+  animation: rise-in 0.5s ease-out both;
+}
+
+@keyframes dot-blink {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+.dot-blink {
+  animation: dot-blink 1.25s infinite;
+}
+.dot-blink:nth-child(2) { animation-delay: 0.16s; }
+.dot-blink:nth-child(3) { animation-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-card-idle, .animate-shine, .animate-radar, .animate-radar-sweep,
+  .animate-pulse-soft, .animate-burst-ring, .animate-pop-in, .animate-rise-in,
+  .animate-marquee, .animate-float {
+    animation: none !important;
+  }
 }
 
 /* ── Impressão (extrato em PDF via print) ───────────────── */

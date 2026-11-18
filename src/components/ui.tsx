@@ -153,12 +153,12 @@ export function Spinner({ className }: { className?: string }) {
 }
 
 /* ─────────────────────────── EmptyState ─────────────────────── */
-export function EmptyState({ icon: Icon, title, description, action }: { icon?: React.ElementType; title: string; description?: string; action?: React.ReactNode }) {
+export function EmptyState({ icon, title, description, action }: { icon?: React.ReactNode; title: string; description?: string; action?: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
-      {Icon && (
+      {icon && (
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sand">
-          <Icon className="h-6 w-6 text-forest" />
+          {icon}
         </div>
       )}
       <p className="text-base font-extrabold tracking-tight text-ink">{title}</p>
@@ -216,12 +216,12 @@ export function Modal({
 }
 
 /* ─────────────────────────── Stat ───────────────────────────── */
-export function Stat({ label, value, hint, icon: Icon }: { label: string; value: string; hint?: string; icon?: React.ElementType }) {
+export function Stat({ label, value, hint, icon }: { label: string; value: string; hint?: string; icon?: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-black/5 bg-surface p-4 shadow-sm">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[0.72rem] font-extrabold uppercase tracking-wider text-ink/50">{label}</p>
-        {Icon && <Icon className="h-4 w-4 text-forest/70" />}
+        {icon && <span className="text-forest/70">{icon}</span>}
       </div>
       <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-ink">{value}</p>
       {hint && <p className="mt-0.5 text-xs font-medium text-ink/50">{hint}</p>}

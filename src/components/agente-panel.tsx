@@ -171,7 +171,7 @@ export function AgentePanel({ stats, pendentes, historico }: { stats: AgenteStat
 
       {tab === "pendentes" ? (
         pendentes.length === 0 ? (
-          <EmptyState icon={ShieldCheck} title="Sem ordens de momento" description="Quando receberes uma ordem de depósito ou levantamento, ela aparece aqui com o cronómetro." />
+          <EmptyState icon={<ShieldCheck className="h-6 w-6 text-forest" />} title="Sem ordens de momento" description="Quando receberes uma ordem de depósito ou levantamento, ela aparece aqui com o cronómetro." />
         ) : (
           <div className="grid gap-3">
             {pendentes.map((ordem) => (
@@ -191,7 +191,7 @@ export function AgentePanel({ stats, pendentes, historico }: { stats: AgenteStat
         )
       ) : (
         historico.length === 0 ? (
-          <EmptyState icon={Store} title="Ainda sem histórico" description="As tuas operações concluídas e canceladas aparecem aqui." />
+          <EmptyState icon={<Store className="h-6 w-6 text-forest" />} title="Ainda sem histórico" description="As tuas operações concluídas e canceladas aparecem aqui." />
         ) : (
           <ul className="divide-y divide-black/5 overflow-hidden rounded-3xl border border-black/5 bg-surface">
             {historico.map((o) => (

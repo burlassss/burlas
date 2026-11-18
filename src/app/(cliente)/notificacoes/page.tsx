@@ -18,7 +18,7 @@ export default async function NotificacoesPage() {
       <h1 className="text-2xl font-extrabold tracking-[-0.03em] text-forest sm:text-3xl">Notificações</h1>
       <p className="mb-4 mt-1 text-sm font-medium text-ink/55">Tudo o que importa sobre a tua conta, num só lugar.</p>
       {notificacoes.length === 0 ? (
-        <EmptyState icon={Bell} title="Sem notificações" description="Quando algo relevante acontecer na tua conta, avisamos-te aqui e por SMS." />
+        <EmptyState icon={<Bell className="h-6 w-6 text-forest" />} title="Sem notificações" description="Quando algo relevante acontecer na tua conta, avisamos-te aqui e por SMS." />
       ) : (
         <NotificacoesLista itens={notificacoes} />
       )}
