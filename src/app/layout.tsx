@@ -18,12 +18,13 @@ export const viewport: Viewport = {
   themeColor: "#163c2b",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-MZ">
-      <body className="min-h-screen bg-cream text-ink antialiased">
+      <body className="min-h-dvh bg-cream text-ink antialiased">
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

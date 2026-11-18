@@ -47,11 +47,11 @@ export default async function PainelPage() {
   const primeiroNome = user.nome.trim().split(/\s+/)[0];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {/* Saudação */}
       <div className="flex flex-wrap items-end justify-between gap-3 pt-1">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-[-0.03em] text-forest sm:text-3xl">{saudacao}, {primeiroNome}</h1>
+          <h1 className="text-[1.55rem] font-extrabold tracking-[-0.03em] text-forest min-[380px]:text-2xl sm:text-3xl">{saudacao}, {primeiroNome}</h1>
           <p className="mt-0.5 text-sm font-medium text-ink/55">Aqui está o resumo da tua carteira hoje.</p>
         </div>
         {demo && (
@@ -82,14 +82,14 @@ export default async function PainelPage() {
       />
 
       {/* Ações rápidas */}
-      <nav className="grid grid-cols-4 gap-2 sm:gap-3" aria-label="Ações rápidas">
+      <nav className="grid grid-cols-2 gap-2 min-[380px]:grid-cols-4 sm:gap-3" aria-label="Ações rápidas">
         {[
           { href: "/depositar", rotulo: "Depositar", icone: ArrowDownToLine },
           { href: "/levantar", rotulo: "Levantar", icone: ArrowUpRight },
           { href: "/cartoes", rotulo: "Novo cartão", icone: CreditCard },
           { href: "/extrato", rotulo: "Extrato", icone: Receipt },
         ].map((a) => (
-          <Link key={a.href + a.rotulo} href={a.href} className="flex flex-col items-center gap-1.5 rounded-2xl border border-black/5 bg-surface py-3.5 text-[0.72rem] font-extrabold text-ink/75 shadow-sm transition-all hover:border-forest hover:text-forest">
+          <Link key={a.href + a.rotulo} href={a.href} className="flex flex-col items-center gap-1.5 rounded-2xl border border-black/5 bg-surface py-3 text-center text-[0.72rem] leading-tight font-extrabold text-ink/75 shadow-sm transition-all hover:border-forest hover:text-forest">
             <a.icone className="h-5 w-5 text-forest" strokeWidth={2.2} />
             {a.rotulo}
           </Link>
@@ -110,14 +110,14 @@ export default async function PainelPage() {
               {recentes.map((mov) => {
                 const positivo = mov.valor >= 0;
                 return (
-                  <li key={mov.id} className="flex items-center gap-3 px-5 py-3.5 sm:px-6">
+                  <li key={mov.id} className="flex items-center gap-2.5 px-4 py-3 sm:gap-3 sm:px-6 sm:py-3.5">
                     <MovimentoIcon tipo={mov.tipo} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-ink">{mov.descricao || TIPO_MOVIMENTO[mov.tipo]}</p>
                       <p className="text-[0.68rem] font-semibold text-ink/45">{formatDataHora(mov.criado_em)}{mov.estado !== "confirmado" && " · pendente"}</p>
                     </div>
                     <div className="text-right">
-                      <p className={`text-sm font-extrabold tabular-nums ${positivo ? "text-forest" : "text-ink"}`}>
+                      <p className={`text-[0.78rem] font-extrabold tabular-nums min-[380px]:text-sm ${positivo ? "text-forest" : "text-ink"}`}>
                         {positivo ? "+" : ""}{formatMoeda(Math.round(mov.valor * 100), "USD")}
                       </p>
                       <p className="text-[0.62rem] font-bold uppercase tracking-wider text-ink/40">{TIPO_MOVIMENTO[mov.tipo] ?? mov.tipo}</p>

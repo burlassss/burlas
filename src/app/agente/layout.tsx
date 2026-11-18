@@ -7,11 +7,11 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Painel de Agente" };
 
 export default async function AgenteLayout({ children }: { children: React.ReactNode }) {
-  const user = await requireAgente();
+  await requireAgente();
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-dvh bg-cream">
       <header className="sticky top-0 z-40 border-b border-black/5 bg-pine text-cream">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        <div className="safe-x mx-auto flex h-16 max-w-6xl items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <Link href="/agente" aria-label="Painel de Agente"><Logo compact /></Link>
             <span className="hidden items-center gap-1.5 rounded-full bg-lime/15 px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-lime sm:inline-flex">
@@ -26,7 +26,7 @@ export default async function AgenteLayout({ children }: { children: React.React
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-5 sm:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-6xl safe-x pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4 sm:pt-5">{children}</main>
     </div>
   );
 }

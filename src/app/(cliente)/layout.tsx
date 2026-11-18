@@ -10,9 +10,9 @@ export default async function ClienteLayout({ children }: { children: React.Reac
   const naoLidas = notificacoes.filter((n) => n.estado !== "lida").length;
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-dvh w-full bg-cream">
       <AppHeader nome={user.nome} naoLidas={naoLidas} />
-      <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 sm:pt-6 md:pb-10">{children}</main>
+      <main className="safe-x mx-auto w-full max-w-6xl pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-3 sm:pt-6 md:pb-10">{children}</main>
     </div>
   );
 }

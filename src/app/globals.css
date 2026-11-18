@@ -22,17 +22,44 @@
 }
 
 html {
+  min-height: 100%;
   scroll-behavior: smooth;
   overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
+  width: 100%;
+  min-height: 100dvh;
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+/* Todos os conteúdos têm de conseguir encolher dentro do viewport. */
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+/* Barras horizontais funcionais sem ocuparem altura no telemóvel. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Inputs que respiram melhor no ecrã pequeno. */
+@media (max-width: 380px) {
+  input, select, textarea {
+    font-size: 16px; /* evita auto-zoom no iOS ao focar inputs */
+  }
 }
 
 ::selection {
@@ -109,6 +136,19 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #c9c9c2 transparent;
 }
+
+/* ── Shell ocupa o ecrã inteiro em telemóvel (inclusive notches) ─ */
+.safe-x {
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+}
+@media (min-width: 640px) {
+  .safe-x {
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+  }
+}
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
 /* ── 3D: cartão premium ─────────────────────────────────── */
 .persp-1200 { perspective: 1200px; }
