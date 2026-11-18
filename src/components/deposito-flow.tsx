@@ -62,16 +62,18 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
   const [copiado, setCopiado] = React.useState<string | null>(null);
 
   const mznNumero = Number(valorMzn.replace(/\s/g, "").replace(",", ".")) || 0;
+  const cotacaoVisivel = mznNumero >= 100 ? cotacao : null;
 
   // Cotação ao vivo (debounce) para M-Pesa / e-Mola
   React.useEffect(() => {
-    if (etapa !== "valor" || metodo === "usdt_trc20") return;
-    if (mznNumero < 100) { setCotacao(null); return; }
-    setCotando(true);
+    if (etapa !== "valor" || metodo === "usdt_trc20" || mznNumero < 100) return;
     const t = window.setTimeout(async () => {
+      setCotando(true);
       try {
         const resp = await fetch(`/api/depositos/cotacao?metodo=${metodo}&mzn=${mznNumero}`);
-        if (resp.ok) setCotacao(await resp.json());
+        if (resp.ok) setCotacao(await resp.json()); else setCotacao(null);
+      } catch {
+        setCotacao(null);
       } finally {
         setCotando(false);
       }
@@ -182,7 +184,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
         {/* Cartão do agente */}
         {agente && (
           <div className="overflow-hidden rounded-3xl border border-forest/15 bg-surface shadow-lift">
-            <div className="flex items-center gap-4 bg-forest p-4 text-cream sm:p-5">
+            <div className="flex items-center gap-3 bg-forest p-3.5 text-cream min-[380px]:gap-4 min-[380px]:p-4 sm:p-5">
               <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-lime font-black text-pine">
                 <span className="text-lg">{iniciais}</span>
               </span>
@@ -200,7 +202,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
             <div className="flex items-center justify-between gap-3 border-b border-black/5 p-4 sm:px-6">
               <div className="min-w-0">
                 <p className="text-[0.6rem] font-extrabold uppercase tracking-[0.2em] text-ink/45">Número do agente · {operador}</p>
-                <a href={`tel:${agente.telefone}`} className="mt-0.5 block truncate font-mono text-lg font-black tracking-wide text-forest sm:text-xl">{agente.telefone}</a>
+                <a href={`tel:${agente.telefone}`} className="mt-0.5 block break-all font-mono text-base font-black tracking-wide text-forest min-[380px]:text-lg sm:text-xl">{agente.telefone}</a>
               </div>
               <button onClick={() => copiar(agente.telefone, "telefone")} className="shrink-0 rounded-2xl bg-sand p-3 text-forest transition-colors hover:bg-mist" aria-label="Copiar número do agente">
                 {copiado === "telefone" ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
@@ -210,11 +212,11 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
             <div className="grid grid-cols-2 gap-2 p-4 sm:p-5">
               <div className="rounded-2xl bg-lime-soft p-4 text-center">
                 <p className="text-[0.58rem] font-extrabold uppercase tracking-wider text-forest/60">Transfere exatamente</p>
-                <p className="mt-0.5 text-2xl font-extrabold tabular-nums text-forest">MT {transferir}</p>
+                <p className="mt-0.5 break-words text-lg font-extrabold tabular-nums text-forest min-[380px]:text-2xl">MT {transferir}</p>
               </div>
               <div className="rounded-2xl bg-sand/60 p-4 text-center">
                 <p className="text-[0.58rem] font-extrabold uppercase tracking-wider text-ink/45">Recebes na carteira</p>
-                <p className="mt-0.5 text-2xl font-extrabold tabular-nums text-ink">{formatMoeda(Math.round((deposito.valor_liquido_usd ?? 0) * 100), "USD")}</p>
+                <p className="mt-0.5 truncate text-xl font-extrabold tabular-nums text-ink min-[380px]:text-2xl">{formatMoeda(Math.round((deposito.valor_liquido_usd ?? 0) * 100), "USD")}</p>
               </div>
             </div>
             <ol className="px-5 pb-4 text-[0.78rem] font-semibold leading-snug text-ink/70">
@@ -292,7 +294,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
             <button
               key={c.id}
               onClick={() => { setMetodo(c.id); setErro(null); setEtapa("valor"); }}
-              className="group flex items-center gap-4 rounded-3xl border-2 border-mist bg-surface p-4 text-left transition-all hover:border-forest hover:shadow-md sm:p-5"
+              className="group flex items-center gap-4 rounded-3xl border-2 border-mist bg-surface p-4 min-[380px]:p-5 text-left transition-all hover:border-forest hover:shadow-md sm:p-5"
             >
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-lime-soft text-forest transition-transform group-hover:scale-105">
                 <c.icon className="h-7 w-7" strokeWidth={1.8} />
@@ -326,7 +328,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
         />
 
         {isCrypto ? (
-          <div className="rounded-3xl border border-black/5 bg-surface p-6">
+          <div className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
             <Label htmlFor="valor-usd">Valor em dólares</Label>
             <div className="relative mt-1">
               <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-3xl font-extrabold text-ink/30">$</span>
@@ -335,7 +337,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
                 inputMode="decimal"
                 value={valorUsd}
                 onChange={(e) => setValorUsd(e.target.value.replace(/[^\d.,]/g, ""))}
-                className="h-20 w-full rounded-2xl border-2 border-mist bg-cream pl-12 text-4xl font-extrabold tracking-tight text-forest focus:border-forest focus:outline-none"
+                className="h-16 w-full rounded-2xl border-2 border-mist bg-cream pl-11 text-3xl min-[380px]:h-20 min-[380px]:pl-12 min-[380px]:text-4xl font-extrabold tracking-tight text-forest focus:border-forest focus:outline-none"
                 aria-describedby="valor-usd-ajuda"
               />
             </div>
@@ -348,7 +350,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
             <ResumoLinha label="Recebes na carteira" destaque valor={`$${((Number(valorUsd.replace(",", ".")) || 0) * 0.995).toFixed(2)}`} />
           </div>
         ) : (
-          <div className="rounded-3xl border border-black/5 bg-surface p-6">
+          <div className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
             <Label htmlFor="valor-mzn">Valor em meticais (MZN)</Label>
             <div className="relative mt-1">
               <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-extrabold text-ink/30">MT</span>
@@ -357,7 +359,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
                 inputMode="decimal"
                 value={valorMzn}
                 onChange={(e) => setValorMzn(e.target.value.replace(/[^\d\s.,]/g, ""))}
-                className="h-20 w-full rounded-2xl border-2 border-mist bg-cream pl-16 text-4xl font-extrabold tracking-tight text-forest focus:border-forest focus:outline-none"
+                className="h-16 w-full rounded-2xl border-2 border-mist bg-cream pl-14 text-3xl min-[380px]:h-20 min-[380px]:pl-16 min-[380px]:text-4xl font-extrabold tracking-tight text-forest focus:border-forest focus:outline-none"
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -370,12 +372,12 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
             <div className="mt-4 rounded-2xl bg-sand/60 p-4 text-sm font-semibold text-ink/75">
               {cotando ? (
                 <p className="flex items-center gap-2 text-ink/50"><Loader2 className="h-4 w-4 animate-spin" /> A calcular…</p>
-              ) : cotacao ? (
+              ) : cotacaoVisivel ? (
                 <>
-                  <div className="flex items-center justify-between gap-2"><span>Cotação</span><span className="text-right">1 USD = MT {cotacao.taxaBase.toFixed(2)} · margem {cotacao.margemPct.toFixed(2)}%</span></div>
-                  <div className="mt-1.5 flex items-center justify-between"><span>Valor em dólares</span><span>{formatMoeda(cotacao.valorUsdCents, "USD")}</span></div>
-                  <div className="mt-1.5 flex items-center justify-between"><span>Taxa depósito ({cotacao.taxaPct}%)</span><span>−{formatMoeda(cotacao.taxaDepositoCents, "USD")}</span></div>
-                  <div className="mt-1.5 flex items-center justify-between border-t border-black/10 pt-2 font-extrabold text-forest"><span>Recebes</span><span>{formatMoeda(cotacao.valorLiquidoCents, "USD")}</span></div>
+                  <div className="flex items-center justify-between gap-2"><span>Cotação</span><span className="text-right">1 USD = MT {cotacaoVisivel.taxaBase.toFixed(2)} · margem {cotacaoVisivel.margemPct.toFixed(2)}%</span></div>
+                  <div className="mt-1.5 flex items-center justify-between"><span>Valor em dólares</span><span>{formatMoeda(cotacaoVisivel.valorUsdCents, "USD")}</span></div>
+                  <div className="mt-1.5 flex items-center justify-between"><span>Taxa depósito ({cotacaoVisivel.taxaPct}%)</span><span>−{formatMoeda(cotacaoVisivel.taxaDepositoCents, "USD")}</span></div>
+                  <div className="mt-1.5 flex items-center justify-between border-t border-black/10 pt-2 font-extrabold text-forest"><span>Recebes</span><span>{formatMoeda(cotacaoVisivel.valorLiquidoCents, "USD")}</span></div>
                 </>
               ) : (
                 <p className="text-ink/45">Introduz um valor igual ou maior que MT 100,00 para veres a conversão.</p>
@@ -397,7 +399,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
     return (
       <div>
         <PassoCabecalho passo={3} titulo="Envia o USDT" subtitulo="Só é creditado após a rede confirmar — nunca antes." voltar={false} />
-        <div className="rounded-3xl border border-black/5 bg-surface p-6">
+        <div className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
           <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-ink/45">Endereço de depósito · TRC20</p>
           <div className="mt-2 flex items-center gap-2 rounded-2xl border-2 border-dashed border-mist bg-cream p-3">
             <code className="min-w-0 flex-1 break-all font-mono text-xs font-bold text-forest">{deposito.endereco_pagamento}</code>
@@ -550,7 +552,7 @@ function ProcuraAgente({
           <h1 className="mt-1.5 text-2xl font-extrabold tracking-tight text-forest">Procurando no mapa MOZOUT…</h1>
 
           {/* Radar com anel de contagem decrescente */}
-          <div className="relative mt-6 flex h-48 w-48 items-center justify-center sm:h-56 sm:w-56">
+          <div className="relative mt-5 flex h-44 w-44 items-center justify-center min-[380px]:h-48 min-[380px]:w-48 sm:h-56 sm:w-56">
             {/* ondas */}
             <span aria-hidden className="absolute inset-0 rounded-full bg-forest/10 animate-radar" />
             <span aria-hidden className="absolute inset-0 rounded-full bg-forest/15 animate-radar" style={{ animationDelay: "0.8s" }} />
@@ -577,7 +579,7 @@ function ProcuraAgente({
           </div>
 
           {/* contagem */}
-          <p className="mt-5 font-mono text-4xl font-black tabular-nums tracking-tight text-forest" aria-live="polite">
+          <p className="mt-5 font-mono text-3xl font-black min-[380px]:text-4xl tabular-nums tracking-tight text-forest" aria-live="polite">
             00:{String(restante).padStart(2, "0")}
           </p>
           <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-ink/45">segundos restantes</p>

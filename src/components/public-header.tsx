@@ -11,7 +11,7 @@ export function PublicHeader() {
   const [aberto, setAberto] = React.useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-black/5 bg-cream/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="safe-x mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 sm:gap-4">
         <Link href="/" aria-label="MOZOUT-USD — Página inicial">
           <Logo />
         </Link>
@@ -30,7 +30,7 @@ export function PublicHeader() {
         </button>
       </div>
       {aberto && (
-        <div className="border-t border-black/5 bg-cream px-4 pb-6 pt-2 lg:hidden">
+        <div className="safe-x border-t border-black/5 bg-cream pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-2 lg:hidden">
           <nav className="flex flex-col divide-y divide-black/5 text-[1.05rem] font-extrabold text-ink">
             <a href="#como-funciona" onClick={() => setAberto(false)} className="py-3.5">Como funciona</a>
             <a href="#planos" onClick={() => setAberto(false)} className="py-3.5">Planos</a>

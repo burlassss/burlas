@@ -96,7 +96,7 @@ export function AdminSidebar({ papel, depositosPendentes, levantamentosPendentes
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto bg-pine px-3 py-5 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto bg-pine px-3 py-5 lg:flex">
         <Link href="/admin" className="px-3">
           <span className="text-lg font-extrabold tracking-tight text-cream">mozout<span className="ml-1.5 rounded-md bg-lime px-1.5 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.14em] text-pine align-[2px]">Admin</span></span>
         </Link>
@@ -107,7 +107,7 @@ export function AdminSidebar({ papel, depositosPendentes, levantamentosPendentes
         <div className="border-b border-black/5 bg-pine px-3 py-2.5">
           <Link href="/admin" className="text-base font-extrabold text-cream">mozout<span className="ml-1.5 rounded-md bg-lime px-1.5 py-0.5 text-[0.55rem] font-extrabold uppercase text-pine align-[2px]">Admin</span></Link>
         </div>
-        <div className="flex gap-1.5 overflow-x-auto border-b border-black/5 bg-pine px-3 pb-2.5">
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto border-b border-black/5 bg-pine px-3 pb-2.5">
           {secoes.flatMap((s) => s.itens).filter((item) => temPermissao(papel, item.permissao)).map((item) => {
             const ativo = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
             return (

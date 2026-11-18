@@ -20,10 +20,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const disputasAbertas = disputas.filter((d) => d.estado === "aberta" || d.estado === "em_analise").length;
 
   return (
-    <div className="min-h-screen bg-[#101b14]">
+    <div className="min-h-dvh bg-[#101b14]">
       {/* Top bar administrativa */}
       <header className="sticky top-0 z-40 border-b border-white/8 bg-[#0c1610]/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-5">
+        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-2 px-3 sm:px-5">
           <div className="flex items-center gap-3">
             <Link href="/admin" aria-label="Administração MOZOUT"><Logo compact className="[&_svg]:h-8 [&_svg]:w-8" /></Link>
             <span className="rounded-full border border-lime/30 bg-lime/10 px-2.5 py-1 text-[0.58rem] font-extrabold uppercase tracking-[0.22em] text-lime">Área restrita</span>
@@ -50,7 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="mx-auto flex max-w-[1600px]">
         <AdminSidebar papel={admin.papel} depositosPendentes={depositos.length} levantamentosPendentes={levantamentosPendentes} disputasAbertas={disputasAbertas} />
-        <main className="min-w-0 flex-1 bg-cream px-4 pb-16 pt-5 sm:px-6">{children}</main>
+        <main className="min-w-0 flex-1 bg-cream safe-x pb-16 pt-4 sm:pt-5">{children}</main>
       </div>
     </div>
   );

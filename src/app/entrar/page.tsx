@@ -45,7 +45,7 @@ function EntrarForm() {
     <form onSubmit={submeter} className="flex flex-col gap-4">
       <div>
         <Label htmlFor="identificador">E-mail ou telefone</Label>
-        <Input id="identificador" autoComplete="username" required placeholder="maria@example.com ou +258 84…" value={identificador} onChange={(e) => setIdentificador(e.target.value)} />
+        <Input id="identificador" autoComplete="username" required placeholder="tu@exemplo.com ou +258 84 123 4567" value={identificador} onChange={(e) => setIdentificador(e.target.value)} />
       </div>
       <div>
         <Label htmlFor="password">Palavra-passe</Label>
@@ -66,7 +66,7 @@ function EntrarForm() {
 
 export default function EntrarPage() {
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Painel visual */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-pine p-10 text-cream lg:flex">
         <div aria-hidden className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-lime/15 blur-3xl" />
@@ -102,7 +102,7 @@ export default function EntrarPage() {
           <div className="mt-8 rounded-2xl border border-forest/15 bg-lime-soft p-4">
             <p className="flex items-center gap-2 text-[0.72rem] font-extrabold uppercase tracking-wider text-forest"><ShieldCheck className="h-4 w-4" /> Ambiente de demonstração</p>
             <ul className="mt-2 space-y-1 text-xs font-semibold text-forest/90">
-              <li>Cliente · maria@example.com / Cliente#123</li>
+              <li>Cliente — regista a tua conta (começa do zero)</li>
               <li>Agente M-Pesa · agente.mpesa@example.com / Agente#123</li>
               <li>Administração · admin@mozout.co.mz / Mozout#Admin2026</li>
             </ul>

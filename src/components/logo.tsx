@@ -10,9 +10,9 @@ export function Logo({ className, compact = false }: { className?: string; compa
         <text x="32" y="40" fontFamily="'Manrope Variable', Arial Black, sans-serif" fontSize="24" fontWeight={900} textAnchor="middle" fill="#121f16">$</text>
       </svg>
       {!compact && (
-        <span className="flex items-baseline gap-1 leading-none">
-          <span className="text-[1.35rem] font-extrabold tracking-tight text-forest">mozout</span>
-          <span className="rounded-md bg-forest px-1.5 py-0.5 text-[0.62rem] font-extrabold tracking-[0.14em] text-lime">USD</span>
+        <span className="hidden items-baseline gap-1 leading-none min-[360px]:flex">
+          <span className="text-[1.1rem] font-extrabold tracking-tight text-forest min-[380px]:text-[1.35rem]">mozout</span>
+          <span className="rounded-md bg-forest px-1.5 py-0.5 text-[0.58rem] font-extrabold tracking-[0.14em] text-lime sm:text-[0.62rem]">USD</span>
         </span>
       )}
     </span>

@@ -129,7 +129,7 @@ export function ExtratoView({ nome, itens }: { nome: string; itens: ExtratoItem[
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 pt-1 sm:pt-3">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 pt-1 sm:gap-5 sm:pt-3">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-[-0.03em] text-forest sm:text-3xl">Extrato</h1>

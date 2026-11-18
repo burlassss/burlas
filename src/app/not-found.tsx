@@ -3,7 +3,7 @@ import { Compass } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-6 text-center">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-cream px-6 text-center">
       <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sand">
         <Compass className="h-8 w-8 text-forest" strokeWidth={1.8} />
       </span>

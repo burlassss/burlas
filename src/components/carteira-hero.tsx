@@ -114,11 +114,11 @@ export function CarteiraHero({
       <div aria-hidden className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-lime/10 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-emerald-400/10 blur-3xl" />
 
-      <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-12 lg:gap-8 lg:p-8">
+      <div className="relative grid gap-5 p-4 min-[380px]:gap-6 min-[380px]:p-5 lg:grid-cols-12 lg:gap-8 lg:p-8">
         {/* ═══════════ CARTÃO ═══════════ */}
         <div className="flex min-w-0 flex-col lg:col-span-7">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.24em] text-lime/85 sm:text-[0.68rem]">
+            <p className="text-[0.58rem] font-extrabold uppercase tracking-[0.18em] text-lime/85 min-[380px]:text-[0.62rem] sm:text-[0.68rem] sm:tracking-[0.24em]">
               {cartao ? "O teu cartão MOZOUT" : "O teu cartão espera por ti"}
             </p>
             {cartao && (
@@ -143,7 +143,7 @@ export function CarteiraHero({
                   revelado={revelado}
                 />
                 {/* ações */}
-                <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                <div className="mt-3 grid w-full grid-cols-4 items-stretch justify-center gap-1.5 sm:gap-2">
                   <HeroAction onClick={alternarRevelar} busy={busy === "revelar"} icon={revelado ? EyeOff : Eye} label={revelado ? "Ocultar" : "Revelar"} />
                   <HeroAction onClick={copiarNumero} busy={busy === "copiar"} icon={copiado ? Check : Copy} label={copiado ? "Copiado!" : "Copiar nº"} />
                   <HeroAction onClick={alternarCongelado} busy={busy === "congelar"} icon={cartao.estado === "congelado" ? Sun : Snowflake} label={cartao.estado === "congelado" ? "Descongelar" : "Congelar"} />
@@ -173,7 +173,7 @@ export function CarteiraHero({
         <div className="flex min-w-0 flex-col border-t border-white/10 pt-5 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
           {/* saldo */}
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.24em] text-lime/85 sm:text-[0.68rem]">Saldo disponível · USD</p>
+            <p className="text-[0.58rem] font-extrabold uppercase tracking-[0.18em] text-lime/85 min-[380px]:text-[0.62rem] sm:text-[0.68rem] sm:tracking-[0.24em]">Saldo disponível · USD</p>
             <button
               onClick={() => setVisivel((v) => !v)}
               className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-[0.68rem] font-bold text-cream/85 transition-colors hover:bg-white/10"
@@ -183,7 +183,7 @@ export function CarteiraHero({
               {visivel ? "Ocultar" : "Mostrar"}
             </button>
           </div>
-          <p className="mt-1.5 min-w-0 break-words text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] tabular-nums text-cream sm:text-6xl">
+          <p className="mt-1.5 min-w-0 whitespace-nowrap [font-size:clamp(2.05rem,10.8vw,2.6rem)] font-extrabold leading-[1.02] tracking-[-0.045em] tabular-nums text-cream sm:text-6xl">
             {visivel ? formatMoeda(saldoCents, "USD") : "$ ••••••"}
           </p>
           <p className="mt-1.5 text-xs font-semibold text-cream/60 sm:text-sm">
@@ -194,26 +194,26 @@ export function CarteiraHero({
 
           {/* stats */}
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-3 sm:p-3.5">
+            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 min-[380px]:p-3 sm:p-3.5">
               <p className="flex items-center gap-1.5 text-[0.52rem] font-extrabold uppercase tracking-[0.18em] text-lime/80 sm:text-[0.58rem]"><ArrowLeftRight className="h-3.5 w-3.5" /> Câmbio do dia</p>
-              <p className="mt-1.5 truncate text-sm font-extrabold tabular-nums text-cream sm:text-base">1 USD = MT {cotacao.toFixed(2)}</p>
+              <p className="mt-1.5 truncate [font-size:clamp(0.7rem,3.7vw,0.875rem)] sm:text-base font-extrabold tabular-nums text-cream">1 USD = MT {cotacao.toFixed(2)}</p>
               <p className="text-[0.6rem] font-bold text-cream/50 sm:text-[0.65rem]">margem {margemPct.toFixed(2)}%</p>
             </div>
-            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-3 sm:p-3.5">
+            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 min-[380px]:p-3 sm:p-3.5">
               <p className="flex items-center gap-1.5 text-[0.52rem] font-extrabold uppercase tracking-[0.18em] text-lime/80 sm:text-[0.58rem]"><Lock className="h-3.5 w-3.5" /> Reservado</p>
-              <p className="mt-1.5 truncate text-sm font-extrabold tabular-nums text-cream sm:text-base">{visivel ? formatMoeda(reservadoCents, "USD") : "$ ••••"}</p>
+              <p className="mt-1.5 truncate [font-size:clamp(0.7rem,3.7vw,0.875rem)] sm:text-base font-extrabold tabular-nums text-cream">{visivel ? formatMoeda(reservadoCents, "USD") : "$ ••••"}</p>
               <p className="text-[0.6rem] font-bold text-cream/50 sm:text-[0.65rem]">em operações ativas</p>
             </div>
-            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-3 sm:p-3.5">
+            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 min-[380px]:p-3 sm:p-3.5">
               <p className="flex items-center gap-1.5 text-[0.52rem] font-extrabold uppercase tracking-[0.18em] text-lime/80 sm:text-[0.58rem]"><Wallet className="h-3.5 w-3.5" /> Gasto no mês</p>
-              <p className="mt-1.5 truncate text-sm font-extrabold tabular-nums text-cream sm:text-base">{cartao ? formatMoeda(cartao.gastosMesCents, "USD") : "$ 0.00"}</p>
+              <p className="mt-1.5 truncate [font-size:clamp(0.7rem,3.7vw,0.875rem)] sm:text-base font-extrabold tabular-nums text-cream">{cartao ? formatMoeda(cartao.gastosMesCents, "USD") : "$ 0.00"}</p>
               <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full rounded-full bg-lime transition-all duration-500" style={{ width: `${cartao ? pctLimite : 0}%` }} />
               </div>
             </div>
-            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-3 sm:p-3.5">
+            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 min-[380px]:p-3 sm:p-3.5">
               <p className="flex items-center gap-1.5 text-[0.52rem] font-extrabold uppercase tracking-[0.18em] text-lime/80 sm:text-[0.58rem]"><CalendarClock className="h-3.5 w-3.5" /> Validade</p>
-              <p className="mt-1.5 truncate text-sm font-extrabold tabular-nums text-cream sm:text-base">{cartao ? cartao.validade : "— / —"}</p>
+              <p className="mt-1.5 truncate [font-size:clamp(0.7rem,3.7vw,0.875rem)] sm:text-base font-extrabold tabular-nums text-cream">{cartao ? cartao.validade : "— / —"}</p>
               <p className="text-[0.6rem] font-bold text-cream/50 sm:text-[0.65rem]">{cartao ? cartao.planNome : "sem cartão ainda"}</p>
             </div>
           </div>
@@ -271,7 +271,7 @@ function HeroAction({ onClick, icon: Icon, label, busy }: { onClick: () => void;
     <button
       onClick={onClick}
       disabled={busy}
-      className="flex min-w-[4.6rem] flex-col items-center gap-1 rounded-2xl border border-white/12 bg-white/[0.06] px-3 py-2 text-[0.58rem] font-extrabold text-cream/85 transition-all hover:border-lime/50 hover:bg-white/10 hover:text-lime disabled:opacity-60 sm:min-w-[5rem]"
+      className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl border border-white/12 bg-white/[0.06] px-1.5 py-2 text-[0.52rem] font-extrabold text-cream/85 min-[380px]:text-[0.58rem] transition-all hover:border-lime/50 hover:bg-white/10 hover:text-lime disabled:opacity-60 sm:min-w-[5rem]"
     >
       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" strokeWidth={2} />}
       <span className="leading-tight">{label}</span>

@@ -46,14 +46,17 @@ export function LevantamentoFlow({ telefoneInicial, recentes }: { telefoneInicia
 
   const valorNumero = Number(valorUsd.replace(",", ".")) || 0;
   const destinoOk = telefoneValido(destino.replace(/\s/g, ""));
+  const cotacaoVisivel = valorNumero >= 5 ? cotacao : null;
 
   React.useEffect(() => {
-    if (valorNumero < 5) { setCotacao(null); return; }
-    setCotando(true);
+    if (valorNumero < 5) return;
     const t = window.setTimeout(async () => {
+      setCotando(true);
       try {
         const resp = await fetch(`/api/levantamentos/cotacao?metodo=${metodo}&usd=${valorNumero}`);
-        if (resp.ok) setCotacao(await resp.json());
+        if (resp.ok) setCotacao(await resp.json()); else setCotacao(null);
+      } catch {
+        setCotacao(null);
       } finally {
         setCotando(false);
       }
@@ -121,15 +124,15 @@ export function LevantamentoFlow({ telefoneInicial, recentes }: { telefoneInicia
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-[-0.03em] text-forest sm:text-3xl">Levantar dólares</h1>
+        <h1 className="text-[1.55rem] font-extrabold tracking-[-0.03em] text-forest min-[380px]:text-2xl sm:text-3xl">Levantar dólares</h1>
         <p className="mt-1 font-medium text-ink/60">Recebes em meticais na tua carteira móvel. Os fundos ficam reservados até concluíres.</p>
       </div>
 
-      <div className="rounded-3xl border border-black/5 bg-surface p-6">
+      <div className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
         <Label htmlFor="valor">Quanto queres levantar?</Label>
         <div className="relative mt-1">
           <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-3xl font-extrabold text-ink/30">$</span>
-          <input id="valor" inputMode="decimal" value={valorUsd} onChange={(e) => setValorUsd(e.target.value.replace(/[^\d.,]/g, ""))} className="h-20 w-full rounded-2xl border-2 border-mist bg-cream pl-12 text-4xl font-extrabold tracking-tight text-forest focus:border-forest focus:outline-none" aria-describedby="ajuda-valor" />
+          <input id="valor" inputMode="decimal" value={valorUsd} onChange={(e) => setValorUsd(e.target.value.replace(/[^\d.,]/g, ""))} className="h-16 w-full rounded-2xl border-2 border-mist bg-cream pl-11 text-3xl min-[380px]:h-20 min-[380px]:pl-12 min-[380px]:text-4xl font-extrabold tracking-tight text-forest focus:border-forest focus:outline-none" aria-describedby="ajuda-valor" />
         </div>
         <div className="mt-3 flex flex-wrap gap-2" id="ajuda-valor">
           {["20", "50", "100", "250"].map((v) => (
@@ -163,12 +166,12 @@ export function LevantamentoFlow({ telefoneInicial, recentes }: { telefoneInicia
         <div className="mt-4 rounded-2xl bg-sand/60 p-4 text-sm font-semibold text-ink/75">
           {cotando ? (
             <p className="flex items-center gap-2 text-ink/50"><Loader2 className="h-4 w-4 animate-spin" /> A calcular…</p>
-          ) : cotacao ? (
+          ) : cotacaoVisivel ? (
             <>
-              <div className="flex items-center justify-between"><span>Cotação efetiva</span><span>1 USD = MT {cotacao.taxaEfetiva.toFixed(2)}</span></div>
-              <div className="mt-1.5 flex items-center justify-between"><span>Taxa fixa</span><span>{formatMoeda(cotacao.taxaUsdCents, "USD")}</span></div>
-              <div className="mt-1.5 flex items-center justify-between"><span>Comissão do agente</span><span>{formatMoeda(cotacao.comissaoAgenteCents, "USD")} (paga pela MOZOUT)</span></div>
-              <div className="mt-1.5 flex items-center justify-between border-t border-black/10 pt-2 font-extrabold text-forest"><span>Recebes em meticais</span><span>MT {(cotacao.valorLiquidoMznCents / 100).toLocaleString("pt-MZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+              <div className="flex items-center justify-between"><span>Cotação efetiva</span><span>1 USD = MT {cotacaoVisivel.taxaEfetiva.toFixed(2)}</span></div>
+              <div className="mt-1.5 flex items-center justify-between"><span>Taxa fixa</span><span>{formatMoeda(cotacaoVisivel.taxaUsdCents, "USD")}</span></div>
+              <div className="mt-1.5 flex items-center justify-between"><span>Comissão do agente</span><span>{formatMoeda(cotacaoVisivel.comissaoAgenteCents, "USD")} (paga pela MOZOUT)</span></div>
+              <div className="mt-1.5 flex items-center justify-between border-t border-black/10 pt-2 font-extrabold text-forest"><span>Recebes em meticais</span><span>MT {(cotacaoVisivel.valorLiquidoMznCents / 100).toLocaleString("pt-MZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
             </>
           ) : (
             <p className="flex items-center gap-1.5 text-ink/45"><Info className="h-4 w-4" /> Mínimo $5.00 — a cotação aparece aqui ao vivo.</p>

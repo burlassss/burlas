@@ -94,7 +94,7 @@ export function PremiumCard({
             {/* faixa de luz a varrer */}
             <div aria-hidden className="pointer-events-none absolute inset-y-0 w-28 animate-shine bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-            <div className="relative flex h-full flex-col justify-between p-4 sm:p-5">
+            <div className="relative flex h-full flex-col justify-between p-3.5 min-[380px]:p-4 sm:p-5">
               {/* topo */}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -103,13 +103,13 @@ export function PremiumCard({
                     <circle cx="32" cy="32" r="23.5" fill="none" stroke="#121f16" strokeWidth="2.4" strokeOpacity="0.28" />
                     <text x="32" y="42.5" fontFamily="'Manrope Variable', Arial Black, sans-serif" fontSize="30" fontWeight={900} textAnchor="middle" fill="#121f16">$</text>
                   </svg>
-                  <span className="text-[0.78rem] font-black uppercase tracking-[0.24em] text-cream/95 sm:text-[0.85rem]">Mozout</span>
+                  <span className="text-[0.68rem] font-black uppercase tracking-[0.22em] text-cream/95 min-[380px]:text-[0.78rem] sm:text-[0.85rem]">Mozout</span>
                 </div>
                 <span className="rounded-full border border-white/15 bg-white/8 px-2.5 py-1 text-[0.55rem] font-extrabold uppercase tracking-[0.18em] text-cream/85 sm:text-[0.6rem]">{planNome}</span>
               </div>
 
               {/* chip + NFC */}
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2 sm:gap-2.5">
                 <svg viewBox="0 0 46 34" className="h-7 w-10 drop-shadow-md sm:h-8 sm:w-11" aria-hidden>
                   <rect x="0" y="0" width="46" height="34" rx="6" fill="#e8d9a0" />
                   <rect x="0" y="0" width="46" height="34" rx="6" fill="url(#mc-gold)" fillOpacity="0.6" />
@@ -125,7 +125,7 @@ export function PremiumCard({
 
               {/* número */}
               <p
-                className="font-mono text-[1.02rem] font-semibold tracking-[0.16em] text-cream drop-shadow-sm sm:text-[1.3rem] sm:tracking-[0.18em]"
+                className="font-mono [font-size:clamp(0.76rem,4.8vw,1.02rem)] font-semibold tracking-[0.13em] text-cream drop-shadow-sm sm:text-[1.3rem] sm:tracking-[0.18em]"
                 style={{ textShadow: "0 2px 3px rgb(0 0 0 / 0.45)" }}
               >
                 {displayNumber}
@@ -134,14 +134,14 @@ export function PremiumCard({
               {/* base */}
               <div className="flex items-end justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-[0.42rem] font-bold uppercase tracking-[0.22em] text-cream/55 sm:text-[0.5rem]">Titular do cartão</p>
-                  <p className="truncate text-[0.68rem] font-extrabold uppercase tracking-[0.08em] text-cream/95 sm:text-[0.8rem]">{titular}</p>
+                  <p className="text-[0.38rem] font-bold uppercase tracking-[0.18em] text-cream/55 sm:text-[0.5rem] sm:tracking-[0.22em]">Titular do cartão</p>
+                  <p className="truncate text-[0.58rem] font-extrabold uppercase tracking-[0.07em] text-cream/95 min-[380px]:text-[0.68rem] sm:text-[0.8rem]">{titular}</p>
                 </div>
                 <div className="shrink-0">
-                  <p className="text-[0.42rem] font-bold uppercase tracking-[0.22em] text-cream/55 sm:text-[0.5rem]">Validade</p>
-                  <p className="text-[0.68rem] font-extrabold tabular-nums text-cream/95 sm:text-[0.8rem]">{validade}</p>
+                  <p className="text-[0.38rem] font-bold uppercase tracking-[0.18em] text-cream/55 sm:text-[0.5rem] sm:tracking-[0.22em]">Validade</p>
+                  <p className="text-[0.58rem] font-extrabold tabular-nums text-cream/95 min-[380px]:text-[0.68rem] sm:text-[0.8rem]">{validade}</p>
                 </div>
-                <span className="shrink-0 pb-0.5 text-base font-black italic leading-none tracking-tight text-cream drop-shadow sm:text-[1.35rem]">VISA</span>
+                <span className="shrink-0 pb-0.5 text-sm font-black italic leading-none tracking-tight text-cream drop-shadow min-[380px]:text-base sm:text-[1.35rem]">VISA</span>
               </div>
             </div>
 
@@ -161,7 +161,7 @@ export function PremiumCard({
             <div className="relative mt-6 h-10 w-full bg-[#0a0a0a] sm:mt-7 sm:h-12" />
             {/* assinatura + CVV */}
             <div className="relative px-5 pt-4 sm:px-6">
-              <p className="text-[0.42rem] font-bold uppercase tracking-[0.22em] text-cream/55 sm:text-[0.5rem]">Assinatura autorizada · CVV</p>
+              <p className="text-[0.38rem] font-bold uppercase tracking-[0.18em] text-cream/55 sm:text-[0.5rem] sm:tracking-[0.22em]">Assinatura autorizada · CVV</p>
               <div className="mt-1.5 flex h-9 items-stretch overflow-hidden rounded-md sm:h-10">
                 <div className="signature-lines flex-1 bg-[#f1efe4]" style={{ backgroundImage: "repeating-linear-gradient(-12deg, transparent 0 5px, rgb(0 0 0 / 0.09) 5px 6px)" }} />
                 <div className="flex w-20 shrink-0 items-center justify-center bg-[#e9ffd9] sm:w-24">

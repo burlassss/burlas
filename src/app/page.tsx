@@ -22,22 +22,22 @@ export default async function LandingPage() {
   const planos = (await db.listPlans()).filter((p) => p.ativo);
 
   return (
-    <div className="min-h-screen bg-cream text-ink">
+    <div className="min-h-dvh bg-cream text-ink">
       <PublicHeader />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-lime/30 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -left-48 top-64 h-80 w-80 rounded-full bg-forest/10 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -right-40 -top-40 hidden h-[34rem] w-[34rem] rounded-full bg-lime/30 blur-3xl sm:block" />
+        <div aria-hidden className="pointer-events-none absolute -left-48 top-64 hidden h-80 w-80 rounded-full bg-forest/10 blur-3xl sm:block" />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-3 pb-12 pt-7 min-[380px]:px-4 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
           <div className="lg:col-span-7">
             <span className="inline-flex items-center gap-2 rounded-full border border-forest/15 bg-lime-soft px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-forest">
               <span className="h-2 w-2 animate-pulse rounded-full bg-lime-strong" />
               Agora em Moçambique
             </span>
 
-            <h1 className="mt-5 text-[2.55rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-forest sm:text-6xl lg:text-[4.4rem]">
+            <h1 className="mt-5 text-[2.28rem] min-[380px]:text-[2.55rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-forest sm:text-6xl lg:text-[4.4rem]">
               O teu dinheiro,
               <br />
               <span className="relative inline-block">
@@ -46,7 +46,7 @@ export default async function LandingPage() {
               </span>
             </h1>
 
-            <p className="mt-5 max-w-lg text-lg font-medium leading-snug text-ink/75">
+            <p className="mt-5 max-w-lg text-base min-[380px]:text-lg font-medium leading-snug text-ink/75">
               Carteira digital em dólares, cartão virtual internacional e depósitos por M-Pesa, e-Mola ou USDT.
               Feito em Moçambique, pensado para o mundo.
             </p>
@@ -71,18 +71,18 @@ export default async function LandingPage() {
           {/* Visual composto: cartão + carteira */}
           <div className="relative lg:col-span-5">
             <div className="relative mx-auto w-full max-w-md">
-              <div className="animate-float relative z-10 rotate-[-4deg] rounded-[1.75rem] transition-transform duration-500 hover:rotate-0">
-                <div className="card-noise card-texture relative overflow-hidden rounded-[1.75rem] p-6 text-cream shadow-[0_2px_4px_rgb(0_0_0/0.25),0_40px_70px_-24px_rgb(18_31_22/0.55)] ring-1 ring-white/10">
+              <div className="animate-float relative z-10 rotate-0 sm:rotate-[-4deg] rounded-[1.75rem] transition-transform duration-500 hover:rotate-0">
+                <div className="card-noise card-texture relative overflow-hidden rounded-[1.5rem] min-[380px]:rounded-[1.75rem] p-4 min-[380px]:p-6 text-cream shadow-[0_2px_4px_rgb(0_0_0/0.25),0_40px_70px_-24px_rgb(18_31_22/0.55)] ring-1 ring-white/10">
                   <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-white/12 via-transparent to-black/35" />
                   <div className="relative flex items-center justify-between">
                     <svg viewBox="0 0 64 64" className="h-7 w-7"><circle cx="32" cy="32" r="30" fill="#a9f44d"/><text x="32" y="43" fontFamily="Arial Black, sans-serif" fontSize="34" fontWeight={900} textAnchor="middle" fill="#121f16">$</text></svg>
                     <span className="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-cream/70">Virtual</span>
                   </div>
-                  <p className="relative mt-7 font-mono text-[1.3rem] font-semibold tracking-[0.2em] text-cream/95">4539&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;2071</p>
+                  <p className="relative mt-7 font-mono [font-size:clamp(0.78rem,5.1vw,1.3rem)] font-semibold tracking-[0.14em] min-[380px]:tracking-[0.2em] text-cream/95">4539&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;2071</p>
                   <div className="relative mt-4 flex items-end justify-between">
                     <div>
                       <p className="text-[0.5rem] font-bold uppercase tracking-[0.25em] text-cream/55">Titular</p>
-                      <p className="text-sm font-bold tracking-wide">MARIA FERNANDES</p>
+                      <p className="text-sm font-bold tracking-wide">O TEU NOME</p>
                     </div>
                     <p className="text-lg font-black italic tracking-tight">VISA</p>
                   </div>
@@ -90,14 +90,14 @@ export default async function LandingPage() {
               </div>
 
               {/* Chip de saldo */}
-              <div className="absolute -left-2 top-4 z-20 rounded-2xl border border-black/5 bg-surface/95 px-4 py-2.5 shadow-lg backdrop-blur sm:-left-10">
+              <div className="absolute -left-1 top-2 z-20 hidden min-[380px]:block sm:-left-10 rounded-2xl border border-black/5 bg-surface/95 px-4 py-2.5 shadow-lg backdrop-blur sm:-left-10">
                 <p className="text-[0.6rem] font-extrabold uppercase tracking-wider text-ink/50">Saldo disponível</p>
                 <p className="text-xl font-extrabold tracking-tight text-forest">$1,127.49</p>
                 <p className="text-[0.62rem] font-bold text-ink/50">≈ MT 71 962 · cotação 63,80</p>
               </div>
 
               {/* Chip e-Mola/M-Pesa */}
-              <div className="absolute -right-1 bottom-24 z-20 flex items-center gap-2 rounded-2xl border border-black/5 bg-surface/95 px-4 py-2.5 shadow-lg backdrop-blur sm:-right-6">
+              <div className="absolute -right-1 bottom-24 z-20 hidden items-center gap-2 sm:flex rounded-2xl border border-black/5 bg-surface/95 px-4 py-2.5 shadow-lg backdrop-blur sm:-right-6">
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e60000]/10 text-[#e60000]"><Smartphone className="h-5 w-5" /></span>
                 <span>
                   <span className="block text-[0.68rem] font-extrabold text-ink">M-Pesa · e-Mola</span>
@@ -106,7 +106,7 @@ export default async function LandingPage() {
               </div>
 
               {/* Chip USDT */}
-              <div className="absolute bottom-2 left-8 z-20 flex items-center gap-2 rounded-2xl bg-pine px-4 py-2.5 text-lime shadow-lg">
+              <div className="absolute bottom-2 left-4 z-20 hidden items-center gap-2 min-[380px]:flex rounded-2xl bg-pine px-4 py-2.5 text-lime shadow-lg">
                 <CircleDollarSign className="h-5 w-5" />
                 <span className="text-[0.68rem] font-extrabold">USDT TRC20</span>
               </div>

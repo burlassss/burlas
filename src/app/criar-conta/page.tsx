@@ -121,7 +121,7 @@ export default function CriarContaPage() {
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Painel visual */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-pine p-10 text-cream lg:flex">
         <div aria-hidden className="pointer-events-none absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-lime/10 blur-3xl" />
@@ -157,7 +157,7 @@ export default function CriarContaPage() {
               <form onSubmit={submeterDados} className="mt-7 flex flex-col gap-4">
                 <div>
                   <Label htmlFor="nome">Nome completo</Label>
-                  <Input id="nome" required autoComplete="name" placeholder="Maria Fernandes" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+                  <Input id="nome" required autoComplete="name" placeholder="O teu nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
                 </div>
                 <div>
                   <Label htmlFor="nascimento">Data de nascimento</Label>
@@ -171,7 +171,7 @@ export default function CriarContaPage() {
                 </div>
                 <div>
                   <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" required type="email" autoComplete="email" placeholder="maria@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                  <Input id="email" required type="email" autoComplete="email" placeholder="tu@exemplo.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                 </div>
                 <div>
                   <Label htmlFor="password">Palavra-passe</Label>
