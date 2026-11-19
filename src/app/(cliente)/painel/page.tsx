@@ -3,14 +3,15 @@ import Link from "next/link";
 function safeUltimos4(numero: string): string {
   try { return decryptSecret(numero).slice(-4); } catch { return "••••"; }
 }
-import { ArrowRight, CreditCard, FileText, LifeBuoy, ArrowDownToLine, ArrowUpRight, Receipt } from "lucide-react";
+import { ArrowRight, FileText, LifeBuoy, CheckCircle2, Loader2 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { dataMode } from "@/lib/db";
 import { decryptSecret } from "@/lib/crypto";
 import { cotacao } from "@/lib/services/fx";
 import { formatDataHora, formatMoeda, fromCents } from "@/lib/money";
-import { TIPO_MOVIMENTO } from "@/lib/labels";
+import { resumirDepositos } from "@/lib/depositos-pendentes";
+import { TIPO_MOVIMENTO, METODO_LABEL } from "@/lib/labels";
 import { CarteiraHero } from "@/components/carteira-hero";
 import { MovimentoIcon } from "@/components/movimento";
 import { Badge } from "@/components/ui";
@@ -22,13 +23,17 @@ export default async function PainelPage() {
   const user = await requireUser();
   const demo = dataMode() === "demo";
 
-  const [saldoCents, reservadoCents, recentes, cards, cx] = await Promise.all([
+  const [saldoCents, reservadoCents, recentes, cards, cx, depositos] = await Promise.all([
     db.balanceCents(user.id),
     db.activeReservationsCents(user.id),
     db.listLedger(user.id, { limit: 5 }),
     db.listCardsByUser(user.id),
     cotacao("USD/MZN"),
+    db.listDeposits({ userId: user.id, limit: 30 }),
   ]);
+
+  // Visibilidade de depósitos: a caminho (pendentes) e recém-creditados (48h)
+  const { pendentePrincipal, recemAprovado } = resumirDepositos(depositos);
 
   const card = cards[0] ?? null;
   const plan = card ? await db.findPlan(card.plan_id) : null;
@@ -61,6 +66,46 @@ export default async function PainelPage() {
         )}
       </div>
 
+      {/* Visibilidade de depósitos — a caminho ou recém-creditado */}
+      {pendentePrincipal && (
+        <div role="status" className="flex items-start gap-3 rounded-2xl border border-amber-300/70 bg-amber-50 p-3.5 shadow-sm sm:items-center sm:p-4">
+          <span className="relative flex h-10 w-10 shrink-0">
+            <span aria-hidden className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/40" />
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-amber-400 text-amber-950">
+              <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2.4} />
+            </span>
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.82rem] font-extrabold leading-snug text-amber-950">Depósito a caminho · ref. {pendentePrincipal.referencia}</p>
+            <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug text-amber-900/90">
+              {pendentePrincipal.metodo === "usdt_trc20"
+                ? <>USDT enviado — {formatMoeda(Math.round(pendentePrincipal.valor_usd * 100), "USD")} aguarda confirmação da rede e aprovação.</>
+                : <>Enviaste MT {(pendentePrincipal.valor_mzn ?? 0).toLocaleString("pt-MZ", { minimumFractionDigits: 2 })}{pendentePrincipal.metodo ? ` via ${METODO_LABEL[pendentePrincipal.metodo]}` : ""} — aguarda o agente e o administrador.</>}
+              {" "}O saldo actualiza-se sozinho assim que for aprovado.
+            </p>
+          </div>
+          <Link href="/extrato" className="shrink-0 self-center rounded-full border border-amber-400 bg-amber-100 px-3 py-1.5 text-[0.68rem] font-extrabold text-amber-950 transition-colors hover:bg-amber-200">
+            Acompanhar
+          </Link>
+        </div>
+      )}
+      {recemAprovado && (
+        <div role="status" className="flex items-start gap-3 rounded-2xl border border-lime-strong/50 bg-lime-soft p-3.5 shadow-sm sm:items-center sm:p-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lime-strong text-forest">
+            <CheckCircle2 className="h-6 w-6" strokeWidth={2.2} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.82rem] font-extrabold leading-snug text-forest">Depósito recebido! {formatMoeda(Math.round(((recemAprovado.valor_liquido_usd ?? recemAprovado.valor_usd)) * 100), "USD")} creditados</p>
+            <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug text-forest/80">
+              ref. {recemAprovado.referencia} · {recemAprovado.decidido_em ? formatDataHora(recemAprovado.decidido_em) : "agora mesmo"}
+            </p>
+          </div>
+          <Link href="/extrato" className="shrink-0 self-center rounded-full border border-forest/25 px-3 py-1.5 text-[0.68rem] font-extrabold text-forest transition-colors hover:bg-lime">
+            Ver extrato
+          </Link>
+        </div>
+      )}
+
       {/* Carteira: cartão premium 3D + saldo, câmbio e gastos */}
       <CarteiraHero
         saldoCents={saldoCents}
@@ -80,21 +125,6 @@ export default async function PainelPage() {
           titular: card.titular,
         } : null}
       />
-
-      {/* Ações rápidas */}
-      <nav className="grid grid-cols-2 gap-2 min-[380px]:grid-cols-4 sm:gap-3" aria-label="Ações rápidas">
-        {[
-          { href: "/depositar", rotulo: "Depositar", icone: ArrowDownToLine },
-          { href: "/levantar", rotulo: "Levantar", icone: ArrowUpRight },
-          { href: "/cartoes", rotulo: "Novo cartão", icone: CreditCard },
-          { href: "/extrato", rotulo: "Extrato", icone: Receipt },
-        ].map((a) => (
-          <Link key={a.href + a.rotulo} href={a.href} className="flex flex-col items-center gap-1.5 rounded-2xl border border-black/5 bg-surface py-3 text-center text-[0.72rem] leading-tight font-extrabold text-ink/75 shadow-sm transition-all hover:border-forest hover:text-forest">
-            <a.icone className="h-5 w-5 text-forest" strokeWidth={2.2} />
-            {a.rotulo}
-          </Link>
-        ))}
-      </nav>
 
       {/* Movimentações + carril lateral */}
       <div className="grid gap-5 lg:grid-cols-3">

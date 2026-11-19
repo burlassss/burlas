@@ -27,34 +27,12 @@ export function AppHeader({ nome, naoLidas }: { nome: string; naoLidas: number }
     router.refresh();
   }
 
-  const nav = [
-    { href: "/painel", label: "Painel" },
-    { href: "/depositar", label: "Depositar" },
-    { href: "/levantar", label: "Levantar" },
-    { href: "/extrato", label: "Extrato" },
-  ];
-
   return (
     <header className="sticky top-0 z-40 w-full border-b border-black/5 bg-cream/85 backdrop-blur-xl print:hidden">
       <div className="safe-x mx-auto flex h-16 max-w-6xl items-center justify-between gap-1.5 sm:gap-3">
         <Link href="/painel" aria-label="MOZOUT-USD — Painel">
           <Logo />
         </Link>
-
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Navegação principal">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-bold transition-colors",
-                pathname.startsWith(item.href) ? "bg-forest text-cream" : "text-ink/70 hover:bg-sand hover:text-ink",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Link href="/notificacoes" className="relative rounded-full p-2.5 text-ink transition-colors hover:bg-sand" aria-label={`Notificações${naoLidas ? `, ${naoLidas} por ler` : ""}`}>
@@ -111,13 +89,13 @@ function BottomNav({ pathname }: { pathname: string }) {
     { href: "/extrato", label: "Extrato", icon: Receipt },
   ];
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-black/8 bg-surface/95 backdrop-blur-xl md:hidden" aria-label="Navegação móvel" style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom))", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}>
+    <nav className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-black/8 bg-surface/95 backdrop-blur-xl md:inset-x-auto md:bottom-5 md:left-1/2 md:w-[min(94vw,30rem)] md:-translate-x-1/2 md:overflow-hidden md:rounded-[1.75rem] md:border md:border-black/8 md:shadow-[0_18px_50px_-12px_rgb(18_31_22/0.45)]" aria-label="Navegação principal" style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom))", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}>
       <div className="mx-auto grid w-full max-w-none grid-cols-4">
         {itens.map((item) => {
           const ativo = pathname.startsWith(item.href);
           const Icon = item.icon;
           return (
-            <Link key={item.href} href={item.href} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 py-2", ativo ? "text-forest" : "text-ink/45")}>
+            <Link key={item.href} href={item.href} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 py-2 md:min-h-16 md:rounded-[1.5rem]", ativo ? "text-forest md:bg-lime-soft" : "text-ink/45")}>
               <Icon className="h-5 w-5" strokeWidth={ativo ? 2.4 : 1.8} />
               <span className="max-w-full whitespace-nowrap text-[0.68rem] font-extrabold leading-tight">{item.label}</span>
             </Link>
