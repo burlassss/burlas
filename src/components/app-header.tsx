@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, ChevronDown, LayoutDashboard, ArrowDownToLine, ArrowUpRight, Receipt, UserRound, LogOut, CreditCard } from "lucide-react";
+import { Bell, ChevronDown, Home, History, UserRound, LogOut, CreditCard } from "lucide-react";
 import { cn, initials } from "@/lib/utils";
 import { Logo } from "./logo";
 
@@ -28,6 +28,7 @@ export function AppHeader({ nome, naoLidas }: { nome: string; naoLidas: number }
   }
 
   return (
+    <>
     <header className="sticky top-0 z-40 w-full border-b border-black/5 bg-cream/85 backdrop-blur-xl print:hidden">
       <div className="safe-x mx-auto flex h-16 max-w-6xl items-center justify-between gap-1.5 sm:gap-3">
         <Link href="/painel" aria-label="MOZOUT-USD — Painel">
@@ -76,17 +77,18 @@ export function AppHeader({ nome, naoLidas }: { nome: string; naoLidas: number }
           </div>
         </div>
       </div>
-      <BottomNav pathname={pathname} />
     </header>
+    <BottomNav pathname={pathname} />
+    </>
   );
 }
 
 function BottomNav({ pathname }: { pathname: string }) {
   const itens = [
-    { href: "/painel", label: "Painel", icon: LayoutDashboard },
-    { href: "/depositar", label: "Depositar", icon: ArrowDownToLine },
-    { href: "/levantar", label: "Levantar", icon: ArrowUpRight },
-    { href: "/extrato", label: "Extrato", icon: Receipt },
+    { href: "/painel", label: "Home", icon: Home },
+    { href: "/extrato", label: "Histórico", icon: History },
+    { href: "/cartoes", label: "Cartões", icon: CreditCard },
+    { href: "/perfil", label: "Perfil", icon: UserRound },
   ];
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-black/8 bg-surface/95 backdrop-blur-xl md:inset-x-auto md:bottom-5 md:left-1/2 md:w-[min(94vw,30rem)] md:-translate-x-1/2 md:overflow-hidden md:rounded-[1.75rem] md:border md:border-black/8 md:shadow-[0_18px_50px_-12px_rgb(18_31_22/0.45)]" aria-label="Navegação principal" style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom))", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}>
