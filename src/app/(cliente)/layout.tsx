@@ -12,7 +12,7 @@ export default async function ClienteLayout({ children }: { children: React.Reac
   return (
     <div className="min-h-dvh w-full bg-cream">
       <AppHeader nome={user.nome} naoLidas={naoLidas} />
-      <main className="safe-x mx-auto w-full max-w-6xl pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-3 sm:pt-6 md:pb-10">{children}</main>
+      <main className="safe-x mx-auto w-full max-w-6xl pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-3 sm:pt-6 md:pb-28">{children}</main>
     </div>
   );
 }

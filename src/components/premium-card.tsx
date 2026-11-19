@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Snowflake, Nfc, Wifi } from "lucide-react";
+import { Snowflake, Nfc, Wifi, Lock } from "lucide-react";
 import { cn, formatCardNumber } from "@/lib/utils";
 
 const TEXTURAS: Record<string, string> = {
@@ -191,7 +191,7 @@ export function PremiumCard({
           </div>
         </div>
       </div>
-      <p className="mt-2 text-center text-[0.58rem] font-bold uppercase tracking-[0.2em] text-forest/60">Toca no cartão para virar</p>
+      <p className="mx-auto mt-2.5 flex w-max items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-center text-[0.68rem] font-extrabold uppercase tracking-[0.16em] text-lime shadow-sm sm:text-[0.74rem]"><Lock className="h-3.5 w-3.5" /> Toca para ver o CVV</p>
     </div>
   );
 }
