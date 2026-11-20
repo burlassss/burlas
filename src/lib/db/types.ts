@@ -293,6 +293,37 @@ export interface Dispute {
   resolvida_em: string | null;
 }
 
+export type KycDocumento = "bi" | "passaporte" | "carta_conducao";
+export type KycEstado = "pendente" | "aprovada" | "rejeitada";
+
+export interface KycSubmission {
+  id: string;
+  user_id: string;
+  tipo_documento: KycDocumento;
+  numero_documento: string;
+  frente_url: string | null;
+  verso_url: string | null;
+  selfie_url: string | null;
+  estado: KycEstado;
+  motivo_recusa: string | null;
+  criado_em: string;
+  decidido_em: string | null;
+  decidido_por: string | null;
+}
+
+/** "verificado" = tem submissão aprovada; "pendente" = em análise. */
+export type KycEstadoCliente = "nao_verificado" | "pendente" | "verificado" | "rejeitada";
+
+export interface OnboardingAnswer {
+  id: string;
+  user_id: string;
+  /** Como pretende usar os cartões (mercado_financeiro, compras_online, criptomoeda, assinaturas, outros). */
+  usos: string[];
+  /** Que métodos usava antes (mesma lista de valores). */
+  metodos_antes: string[];
+  criado_em: string;
+}
+
 export interface AuditLog {
   id: string;
   ator: string | null;

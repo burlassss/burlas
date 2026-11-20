@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Button, Input, Label, FieldError } from "@/components/ui";
 
@@ -99,14 +99,6 @@ export default function EntrarPage() {
             <Link href="/criar-conta" className="font-extrabold text-forest underline underline-offset-4 hover:text-moss">Criar conta grátis</Link>
           </p>
 
-          <div className="mt-8 rounded-2xl border border-forest/15 bg-lime-soft p-4">
-            <p className="flex items-center gap-2 text-[0.72rem] font-extrabold uppercase tracking-wider text-forest"><ShieldCheck className="h-4 w-4" /> Ambiente de demonstração</p>
-            <ul className="mt-2 space-y-1 text-xs font-semibold text-forest/90">
-              <li>Cliente — regista a tua conta (começa do zero)</li>
-              <li>Agente M-Pesa · agente.mpesa@example.com / Agente#123</li>
-              <li>Administração · admin@mozout.co.mz / Mozout#Admin2026</li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>

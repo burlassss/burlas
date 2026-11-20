@@ -16,6 +16,7 @@ import { CarteiraHero } from "@/components/carteira-hero";
 import { MovimentoIcon } from "@/components/movimento";
 import { Badge } from "@/components/ui";
 import { ShieldCheck } from "lucide-react";
+import { estadoKyc } from "@/lib/kyc";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export default async function PainelPage() {
     .filter((e) => e.tipo === "compra" && e.criado_em.slice(0, 7) === mesAtual)
     .reduce((acc, e) => acc + Math.abs(Math.round(e.valor * 100)), 0);
 
+  const kyc = await estadoKyc(user.id);
   const mznEquivalente = (fromCents(saldoCents) * cx.valorEfetivo);
   const hora = new Date().getHours();
   const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
@@ -104,6 +106,23 @@ export default async function PainelPage() {
             Ver extrato
           </Link>
         </div>
+      )}
+
+      {/* Verificação de identidade — CTA discreto mas sempre visível */}
+      {kyc !== "verificado" && (
+        <Link
+          href="/kyc"
+          className="group flex items-center gap-3 rounded-2xl border border-forest/20 bg-lime-soft p-3.5 shadow-sm transition-colors hover:bg-lime"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-forest text-lime">
+            <ShieldCheck className="h-5 w-5" strokeWidth={2} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.8rem] font-extrabold leading-snug text-forest">{kyc === "pendente" ? "Verificação em análise" : kyc === "rejeitada" ? "Verificação recusada — corrige e reenvia" : "Verifica a tua identidade"}</p>
+            <p className="mt-0.5 text-[0.68rem] font-semibold leading-snug text-forest/80">{kyc === "pendente" ? "A avisar-te assim que a decisão sair." : "Sem verificação o limite diário é $2.000 USD — com KYC sobe para $5.000 USD."}</p>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-forest transition-transform group-hover:translate-x-0.5" />
+        </Link>
       )}
 
       {/* Carteira: cartão premium 3D + saldo, câmbio e gastos */}

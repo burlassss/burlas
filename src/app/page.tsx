@@ -90,7 +90,7 @@ export default async function LandingPage() {
               </div>
 
               {/* Chip de saldo */}
-              <div className="absolute -left-1 top-2 z-20 hidden min-[380px]:block sm:-left-10 rounded-2xl border border-black/5 bg-surface/95 px-4 py-2.5 shadow-lg backdrop-blur sm:-left-10">
+              <div className="absolute -left-1 top-2 z-20 hidden min-[380px]:block sm:-left-10 rounded-2xl border border-black/5 bg-surface/95 px-4 py-2.5 shadow-lg backdrop-blur">
                 <p className="text-[0.6rem] font-extrabold uppercase tracking-wider text-ink/50">Saldo disponível</p>
                 <p className="text-xl font-extrabold tracking-tight text-forest">$1,127.49</p>
                 <p className="text-[0.62rem] font-bold text-ink/50">≈ MT 71 962 · cotação 63,80</p>

@@ -11,10 +11,11 @@ export const metadata = { title: "Administração" };
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
 
-  const [depositos, levantamentos, disputas] = await Promise.all([
+  const [depositos, levantamentos, disputas, kycPendentes] = await Promise.all([
     db.listDeposits({ estado: "pendente_analise", limit: 100 }),
     db.listWithdrawals({}),
     db.listDisputes(),
+    db.listKycSubmissions({ estado: "pendente" }),
   ]);
   const levantamentosPendentes = levantamentos.filter((w) => ["criada", "aguardando_agente", "atribuida", "em_processamento", "enviada", "aguardando_confirmacao"].includes(w.estado)).length;
   const disputasAbertas = disputas.filter((d) => d.estado === "aberta" || d.estado === "em_analise").length;
@@ -49,7 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
-        <AdminSidebar papel={admin.papel} depositosPendentes={depositos.length} levantamentosPendentes={levantamentosPendentes} disputasAbertas={disputasAbertas} />
+        <AdminSidebar papel={admin.papel} depositosPendentes={depositos.length} levantamentosPendentes={levantamentosPendentes} disputasAbertas={disputasAbertas} kycPendentes={kycPendentes.length} />
         <main className="min-w-0 flex-1 bg-cream safe-x pb-16 pt-4 sm:pt-5">{children}</main>
       </div>
     </div>

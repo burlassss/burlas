@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { criarDepositoUsdt } from "@/lib/services/operations";
 import { rateLimit } from "@/lib/rate-limit";
@@ -16,7 +15,14 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ erro: parsed.error.issues[0]?.message ?? "Valor inválido." }, { status: 422 });
 
-  const deposito = await criarDepositoUsdt(user, Math.round(parsed.data.valorUsd * 100));
+  let deposito;
+  try {
+    deposito = await criarDepositoUsdt(user, Math.round(parsed.data.valorUsd * 100));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Não foi possível criar o depósito.";
+    const ehKyc = /Limite diário|limite diário/i.test(msg);
+    return NextResponse.json({ erro: msg }, { status: ehKyc ? 403 : 500 });
+  }
 
   return NextResponse.json({
     deposito: {

@@ -11,7 +11,9 @@ import type {
   DepositFilter,
   Dispute,
   Fee,
+  KycSubmission,
   LedgerEntry,
+  OnboardingAnswer,
   LedgerFilter,
   Notification,
   OrderFilter,
@@ -334,6 +336,34 @@ export class SupabaseStore implements DataStore {
   }
   async setSetting(chave: string, valor: string) {
     await this.s.from("settings").upsert({ chave, valor }, { onConflict: "chave" });
+  }
+
+  // ── Onboarding & KYC ───────────────────────────────────────
+  async upsertOnboardingAnswer(userId: string, usos: string[], metodosAntes: string[]) {
+    const row = await this.one<OnboardingAnswer>(
+      this.s.from("onboarding_answers").upsert({ user_id: userId, usos, metodos_antes: metodosAntes }, { onConflict: "user_id" }).select().single(),
+    );
+    return row!;
+  }
+  async findOnboardingAnswer(userId: string) {
+    return this.one<OnboardingAnswer>(this.s.from("onboarding_answers").select().eq("user_id", userId).maybeSingle());
+  }
+  async insertKycSubmission(sub: Omit<KycSubmission, "id" | "criado_em" | "decidido_em" | "decidido_por" | "estado" | "motivo_recusa">) {
+    const row = await this.one<KycSubmission>(this.s.from("kyc_submissions").insert(sub).select().single());
+    return row!;
+  }
+  async listKycSubmissions(filter?: { estado?: KycSubmission["estado"] }) {
+    let q = this.s.from("kyc_submissions").select().order("criado_em", { ascending: false });
+    if (filter?.estado) q = q.eq("estado", filter.estado);
+    const { data, error } = await q;
+    if (error) throw new Error(`Supabase: ${error.message}`);
+    return (data ?? []) as KycSubmission[];
+  }
+  async findLatestKycByUser(userId: string) {
+    return this.one<KycSubmission>(this.s.from("kyc_submissions").select().eq("user_id", userId).order("criado_em", { ascending: false }).limit(1).maybeSingle());
+  }
+  async updateKycSubmission(id: string, patch: Partial<Pick<KycSubmission, "estado" | "motivo_recusa" | "decidido_em" | "decidido_por">>) {
+    return this.one<KycSubmission>(this.s.from("kyc_submissions").update(patch).eq("id", id).select().maybeSingle());
   }
 
   // ── Notificações ───────────────────────────────────────────

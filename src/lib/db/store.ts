@@ -9,9 +9,11 @@ import type {
   DepositFilter,
   Dispute,
   Fee,
+  KycSubmission,
   LedgerEntry,
   LedgerFilter,
   Notification,
+  OnboardingAnswer,
   OrderFilter,
   Plan,
   Rate,
@@ -105,6 +107,15 @@ export interface DataStore {
   upsertFee(chave: string, valor: number, moeda?: string, ativo?: boolean): Promise<Fee>;
   listSettings(): Promise<Setting[]>;
   setSetting(chave: string, valor: string): Promise<void>;
+
+  // ── Onboarding & KYC ───────────────────────────────────────
+  upsertOnboardingAnswer(userId: string, usos: string[], metodosAntes: string[]): Promise<OnboardingAnswer>;
+  findOnboardingAnswer(userId: string): Promise<OnboardingAnswer | null>;
+
+  insertKycSubmission(s: Omit<KycSubmission, "id" | "criado_em" | "decidido_em" | "decidido_por" | "estado" | "motivo_recusa">): Promise<KycSubmission>;
+  listKycSubmissions(filter?: { estado?: KycSubmission["estado"] }): Promise<KycSubmission[]>;
+  findLatestKycByUser(userId: string): Promise<KycSubmission | null>;
+  updateKycSubmission(id: string, patch: Partial<Pick<KycSubmission, "estado" | "motivo_recusa" | "decidido_em" | "decidido_por">>): Promise<KycSubmission | null>;
 
   // ── Notificações ───────────────────────────────────────────
   insertNotification(n: Omit<Notification, "id" | "criado_em" | "lido_em">): Promise<Notification>;

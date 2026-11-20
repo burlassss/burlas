@@ -285,3 +285,8 @@ img, svg, video, canvas {
     animation: none !important;
   }
 }
+
+/* Standalone (ícone no ecrã do telemóvel): header respeita o notch/ilha dinâmica */
+@media (display-mode: standalone) {
+  body { padding-top: env(safe-area-inset-top); }
+}
