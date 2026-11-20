@@ -1,5 +1,6 @@
 import { db } from "../db";
 import { enviarSms } from "../integrations/notifica";
+import { pingCliente } from "../realtime";
 
 export type NotificacaoTipo =
   | "codigo_verificacao"
@@ -43,6 +44,7 @@ export async function notificar(
   opts: { tipo: NotificacaoTipo; titulo: string; corpo: string; telefone?: string | null },
 ) {
   await notificarInApp(userId, opts.tipo, opts.titulo, opts.corpo);
+  pingCliente(userId); // tempo real: saldo/extrato/notificações sem refresh
   if (opts.telefone) {
     await notificarSms(userId, opts.telefone, opts.tipo, opts.titulo, opts.corpo).catch(() => undefined);
   }

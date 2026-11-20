@@ -74,7 +74,7 @@ function seed(): DBData {
 
   const plans: Plan[] = [
     {
-      id: uuid(), nome: "Compras Online", slug: "compras-online", tipo: "compras",
+      id: uuid(), nome: "Compras Online", slug: "compras-online", tipo: "compras", tier: "platina", tema: null,
       descricao: "Para lojas internacionais, e-commerce e serviços digitais. Ideal para Amazon, AliExpress, Shein e subscrições avulsas.",
       imagem: null, moedas: ["USD", "EUR", "GBP"], taxa_ativacao_usd: 10, mensalidade_usd: 2.5,
       limite_gasto_usd: 2000, limite_carga_usd: 5000, validade_meses: 36, ordem: 1, ativo: true, destaque: true,
@@ -83,7 +83,7 @@ function seed(): DBData {
       criado_em: agora(),
     },
     {
-      id: uuid(), nome: "Assinaturas", slug: "assinaturas", tipo: "assinaturas",
+      id: uuid(), nome: "Assinaturas", slug: "assinaturas", tipo: "assinaturas", tier: "gold", tema: null,
       descricao: "Feito para pagamentos recorrentes: streaming, ferramentas de IA, software, publicidade e alojamento.",
       imagem: null, moedas: ["USD", "EUR"], taxa_ativacao_usd: 5, mensalidade_usd: 1.5,
       limite_gasto_usd: 1000, limite_carga_usd: 3000, validade_meses: 24, ordem: 2, ativo: true, destaque: false,
@@ -92,7 +92,7 @@ function seed(): DBData {
       criado_em: agora(),
     },
     {
-      id: uuid(), nome: "Viagem", slug: "viagem", tipo: "viagem",
+      id: uuid(), nome: "Viagem", slug: "viagem", tipo: "viagem", tier: "black", tema: null,
       descricao: "Pagamentos em deslocação internacional: hotéis, voos, restaurantes e compras fora de Moçambique.",
       imagem: null, moedas: ["USD", "EUR", "GBP", "ZAR", "AOA"], taxa_ativacao_usd: 15, mensalidade_usd: 0,
       limite_gasto_usd: 5000, limite_carga_usd: 10000, validade_meses: 60, ordem: 3, ativo: true, destaque: false,

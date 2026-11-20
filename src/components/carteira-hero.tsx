@@ -13,10 +13,13 @@ import { useToast } from "./toast";
 import { maskCard } from "@/lib/utils";
 import { formatMoeda } from "@/lib/money";
 
+import type { PlanoTier } from "@/lib/db/types";
+
 export interface HeroCartao {
   id: string;
   planNome: string;
   tipo: string;
+  tier?: PlanoTier | null;
   estado: "ativo" | "congelado" | "cancelado" | "pendente";
   validade: string;
   limiteMensal: number;
@@ -140,6 +143,7 @@ export function CarteiraHero({
                   estado={cartao.estado}
                   planNome={cartao.planNome}
                   tipo={cartao.tipo}
+                  tier={cartao.tier}
                   revelado={revelado}
                 />
                 {/* ações */}

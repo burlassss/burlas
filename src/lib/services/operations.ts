@@ -6,6 +6,7 @@ import { cotacao, mznParaUsd, usdParaMzn } from "./fx";
 import { getFee } from "./fees";
 import { selecionarAgente } from "./agents";
 import { notificar } from "./notify";
+import { pingCliente } from "../realtime";
 
 /* ────────────────────────────────────────────────────────────
  * DEPÓSITOS
@@ -369,6 +370,7 @@ export async function estornarLevantamento(adminId: string | null, withdrawalId:
   const ordens = await db.listOrders({ tipo: "levantamento" });
   const ordem = ordens.find((o) => o.referencia_id === w.id);
   if (ordem) await db.updateOrder(ordem.id, { estado: "cancelada" });
+  pingCliente(w.user_id); // saldo devolvido — atualiza já
   if (adminId) await db.insertAudit({ ator: adminId, acao: "levantamento.estornado", entidade: "withdrawals", entidade_id: w.id, dados: { motivo } });
   return { ok: true };
 }
