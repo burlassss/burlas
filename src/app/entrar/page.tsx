@@ -72,7 +72,7 @@ export default function EntrarPage() {
         <div aria-hidden className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-lime/15 blur-3xl" />
         <Logo className="[&_span:last-child_span:first-child]:!text-cream" />
         <div className="relative">
-          <p className="font-mono text-sm tracking-[0.3em] text-lime">4521&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;1093</p>
+          <p className="font-mono text-sm tracking-[0.3em] text-lime">4521  ••••  ••••  1093</p>
           <h2 className="mt-6 max-w-md text-4xl font-extrabold leading-[1.05] tracking-[-0.03em]">
             Dólares no bolso,<br />mundo nas mãos.
           </h2>

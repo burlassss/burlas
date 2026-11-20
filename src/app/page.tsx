@@ -30,7 +30,7 @@ export default async function LandingPage() {
         <div aria-hidden className="pointer-events-none absolute -right-40 -top-40 hidden h-[34rem] w-[34rem] rounded-full bg-lime/30 blur-3xl sm:block" />
         <div aria-hidden className="pointer-events-none absolute -left-48 top-64 hidden h-80 w-80 rounded-full bg-forest/10 blur-3xl sm:block" />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-7 safe-x pb-10 pt-6 min-[380px]:pt-8 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
+        <div className="relative mx-auto grid grid-cols-1 max-w-6xl items-center gap-7 safe-x pb-10 pt-6 min-[380px]:pt-8 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
           <div className="lg:col-span-7">
             <span className="inline-flex items-center gap-2 rounded-full border border-forest/15 bg-lime-soft px-4 py-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-forest">
               <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-lime-strong" />
@@ -78,7 +78,7 @@ export default async function LandingPage() {
                     <svg viewBox="0 0 64 64" className="h-7 w-7"><circle cx="32" cy="32" r="30" fill="#a9f44d"/><text x="32" y="43" fontFamily="Arial Black, sans-serif" fontSize="34" fontWeight={900} textAnchor="middle" fill="#121f16">$</text></svg>
                     <span className="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-cream/70">Virtual</span>
                   </div>
-                  <p className="relative mt-7 font-mono [font-size:clamp(0.78rem,5.1vw,1.3rem)] font-semibold tracking-[0.14em] min-[380px]:tracking-[0.2em] text-cream/95">4539&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;2071</p>
+                  <p className="relative mt-7 font-mono [font-size:clamp(0.78rem,4.6vw,1.3rem)] font-semibold tracking-[0.1em] sm:tracking-[0.2em] text-cream/95">4539  ••••  ••••  2071</p>
                   <div className="relative mt-4 flex items-end justify-between">
                     <div>
                       <p className="text-[0.5rem] font-bold uppercase tracking-[0.25em] text-cream/55">Titular</p>
@@ -222,7 +222,7 @@ export default async function LandingPage() {
 
       {/* ── AGENTES ─────────────────────────────────────────── */}
       <section id="agentes" className="border-t border-black/5 bg-pine text-cream">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 safe-x py-12 min-[380px]:py-14 lg:grid-cols-12">
+        <div className="mx-auto grid grid-cols-1 max-w-6xl items-center gap-8 safe-x py-12 min-[380px]:py-14 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-lime/80">Rede de agentes MOZOUT</p>
             <h2 className="mt-3 text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-lime min-[380px]:text-3xl sm:text-5xl">

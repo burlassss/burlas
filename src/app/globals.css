@@ -48,6 +48,12 @@ img, svg, video, canvas {
   max-width: 100%;
 }
 
+/* Itens de grelha/flex podem encolher abaixo do tamanho mínimo do conteúdo
+ * (evita que uma única linha não quebrável expanda a coluna além do viewport no telemóvel). */
+.grid > *, .flex > * {
+  min-width: 0;
+}
+
 /* Barras horizontais funcionais sem ocuparem altura no telemóvel. */
 .no-scrollbar {
   -ms-overflow-style: none;
