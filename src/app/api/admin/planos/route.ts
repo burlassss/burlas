@@ -15,7 +15,7 @@ const temaSchema = z.object({
 
 const schema = z.object({
   nome: z.string().trim().min(3).max(80),
-  tier: z.enum(["platina", "gold", "black"]).default("platina"),
+  tier: z.enum(["standard", "platina", "gold"]).default("standard"),
   tema: temaSchema.nullable().default(null),
   slug: z.string().trim().regex(/^[a-z0-9-]{3,60}$/, "Slug: minúsculas, números e hífens."),
   tipo: z.enum(["compras", "assinaturas", "viagem"]),

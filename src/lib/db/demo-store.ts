@@ -92,7 +92,7 @@ function seed(): DBData {
       criado_em: agora(),
     },
     {
-      id: uuid(), nome: "Viagem", slug: "viagem", tipo: "viagem", tier: "black", tema: null,
+      id: uuid(), nome: "Viagem", slug: "viagem", tipo: "viagem", tier: "standard", tema: null,
       descricao: "Pagamentos em deslocação internacional: hotéis, voos, restaurantes e compras fora de Moçambique.",
       imagem: null, moedas: ["USD", "EUR", "GBP", "ZAR", "AOA"], taxa_ativacao_usd: 15, mensalidade_usd: 0,
       limite_gasto_usd: 5000, limite_carga_usd: 10000, validade_meses: 60, ordem: 3, ativo: true, destaque: false,

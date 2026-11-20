@@ -49,7 +49,7 @@ export interface SmsCode {
 export type PlanTipo = "compras" | "assinaturas" | "viagem";
 
 /** Nível premium do cartão — controla o tema da área do cliente. */
-export type PlanoTier = "platina" | "gold" | "black";
+export type PlanoTier = "standard" | "platina" | "gold";
 
 /** Paleta completa do tema (10 cores). Todos os campos em hex #rrggbb. */
 export interface TemaPlano {

@@ -85,7 +85,7 @@ export function PlanosAdmin({ planos }: { planos: Plan[] }) {
                 <h3 className="text-lg font-extrabold tracking-tight text-ink">{plano.nome}</h3>
                 {!plano.ativo && <Badge tone="zinc">Inativo</Badge>}
                 {plano.destaque && <Badge tone="amber">Destaque</Badge>}
-                <Badge tone={plano.tier === "black" ? "zinc" : plano.tier === "gold" ? "amber" : "green"}><Crown className="mr-1 h-3 w-3" />{TIER_INFO[plano.tier ?? "platina"].label}</Badge>
+                <Badge tone={plano.tier === "gold" ? "amber" : "green"}><Crown className="mr-1 h-3 w-3" />{TIER_INFO[plano.tier ?? "standard"].label}</Badge>
               </div>
               <p className="mt-1 line-clamp-2 text-xs font-medium text-ink/55">{plano.descricao}</p>
               <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[0.72rem] font-semibold text-ink/70">
@@ -138,9 +138,9 @@ function FormularioPlano({
     beneficios: (Array.isArray(inicial?.beneficios) ? inicial.beneficios : []).join("\n"),
     ordem: String(inicial?.ordem ?? 1),
   });
-  const [tier, setTier] = React.useState<PlanoTier>(inicial?.tier ?? "platina");
+  const [tier, setTier] = React.useState<PlanoTier>(inicial?.tier ?? "standard");
   const [personalizado, setPersonalizado] = React.useState<boolean>(!!inicial?.tema);
-  const [tema, setTema] = React.useState<TemaPlano>(() => inicial?.tema ?? { ...TIER_PRESETS[inicial?.tier ?? "platina"] });
+  const [tema, setTema] = React.useState<TemaPlano>(() => inicial?.tema ?? { ...TIER_PRESETS[inicial?.tier ?? "standard"] });
 
   function mudarTier(novo: PlanoTier) {
     setTier(novo);

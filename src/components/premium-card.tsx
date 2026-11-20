@@ -5,18 +5,7 @@ import { Snowflake, Nfc, Wifi, Lock } from "lucide-react";
 import { cn, formatCardNumber } from "@/lib/utils";
 
 import type { PlanoTier } from "@/lib/db/types";
-
-const TEXTURAS: Record<string, string> = {
-  compras: "card-texture",
-  assinaturas: "card-texture-purple",
-  viagem: "card-texture-gold",
-};
-
-const TEXTURAS_TIER: Record<PlanoTier, string> = {
-  platina: "card-texture-platinum",
-  gold: "card-texture-gold",
-  black: "card-texture-black",
-};
+import { texturaCartao } from "@/lib/themes";
 
 /**
  * Cartão premium com rotação 3D.
@@ -92,7 +81,7 @@ export function PremiumCard({
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped((v) => !v); } }}
         >
           {/* ═══════════ FRENTE ═══════════ */}
-          <div className={cn("backface-hidden card-noise absolute inset-0 overflow-hidden rounded-[1.6rem] text-cream ring-1 ring-white/15 shadow-[0_2px_6px_rgb(0_0_0/0.3),0_36px_64px_-28px_rgb(18_31_22/0.65)]", (tier ? TEXTURAS_TIER[tier] : TEXTURAS[tipo] ?? "card-texture"), congelado && "saturate-[0.4]")}>
+          <div className={cn("backface-hidden card-noise absolute inset-0 overflow-hidden rounded-[1.6rem] text-cream ring-1 ring-white/15 shadow-[0_2px_6px_rgb(0_0_0/0.3),0_36px_64px_-28px_rgb(18_31_22/0.65)]", texturaCartao(tier, tipo), congelado && "saturate-[0.4]")}>
             {/* brilho exterior */}
             <div aria-hidden className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-lime/15 blur-3xl" />
             <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-white/5 blur-3xl" />
@@ -166,7 +155,7 @@ export function PremiumCard({
           </div>
 
           {/* ═══════════ VERSO ═══════════ */}
-          <div className={cn("backface-hidden rotate-y-180 absolute inset-0 overflow-hidden rounded-[1.6rem] text-cream ring-1 ring-white/15 shadow-[0_2px_6px_rgb(0_0_0/0.3),0_36px_64px_-28px_rgb(18_31_22/0.65)]", TEXTURAS[tipo] ?? "card-texture", congelado && "saturate-[0.4]")}>
+          <div className={cn("backface-hidden rotate-y-180 absolute inset-0 overflow-hidden rounded-[1.6rem] text-cream ring-1 ring-white/15 shadow-[0_2px_6px_rgb(0_0_0/0.3),0_36px_64px_-28px_rgb(18_31_22/0.65)]", texturaCartao(tier, tipo), congelado && "saturate-[0.4]")}>
             <div aria-hidden className="pointer-events-none absolute -left-16 -top-20 h-52 w-52 rounded-full bg-lime/10 blur-3xl" />
             {/* tarja magnética */}
             <div className="relative mt-6 h-10 w-full bg-[#0a0a0a] sm:mt-7 sm:h-12" />
