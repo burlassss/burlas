@@ -7,15 +7,46 @@ import type { Plan, PlanoTier, TemaPlano } from "./db/types";
  * painel de gestão de planos (/admin/planos).
  */
 
-export const TIER_ORDEM: PlanoTier[] = ["platina", "gold", "black"];
+export const TIER_ORDEM: PlanoTier[] = ["standard", "platina", "gold"];
 
 export const TIER_INFO: Record<PlanoTier, { label: string; descricao: string }> = {
-  platina: { label: "Platina", descricao: "Grafite e prata sobre fundo claro — o sucessor natural do verde por defeito." },
+  standard: { label: "Standard", descricao: "O verde original da MOZOUT — tema por defeito." },
+  platina: { label: "Platina", descricao: "Grafite e prata sobre fundo claro." },
   gold: { label: "Gold", descricao: "Marrom profundo e dourado champanhe sobre creme quente." },
-  black: { label: "Black", descricao: "Tema escuro completo, minimalismo preto com acentos neutros." },
 };
 
+const TEXTURAS_TIPO: Record<string, string> = {
+  compras: "card-texture",
+  assinaturas: "card-texture-purple",
+  viagem: "card-texture-gold",
+};
+const TEXTURAS_TIER: Record<PlanoTier, string> = {
+  standard: "card-texture",
+  platina: "card-texture-platinum",
+  gold: "card-texture-gold",
+};
+
+/** Textura do cartão (frente e verso) — o nível manda; sem nível, cai no tipo. */
+export function texturaCartao(tier?: PlanoTier | null, tipo?: string | null): string {
+  if (tier) return TEXTURAS_TIER[tier] ?? "card-texture";
+  return TEXTURAS_TIPO[tipo ?? ""] ?? "card-texture";
+}
+
 export const TIER_PRESETS: Record<PlanoTier, TemaPlano> = {
+  // Verde original da MOZOUT (valores do @theme de globals.css)
+  standard: {
+    bg: "#f6f6f2",
+    surface: "#ffffff",
+    ink: "#121f16",
+    primary: "#163c2b",
+    primary2: "#1e4d38",
+    primary3: "#0f2a1d",
+    accent: "#a9f44d",
+    accentStrong: "#8fe32f",
+    accentSoft: "#e9ffd9",
+    mist: "#e9eae4",
+    sand: "#efefe9",
+  },
   platina: {
     bg: "#f4f4f6",
     surface: "#ffffff",
@@ -42,19 +73,6 @@ export const TIER_PRESETS: Record<PlanoTier, TemaPlano> = {
     mist: "#e9e2cf",
     sand: "#f1ecdd",
   },
-  black: {
-    bg: "#0d0d0f",
-    surface: "#17171a",
-    ink: "#f4f4f6",
-    primary: "#232329",
-    primary2: "#2d2d34",
-    primary3: "#050506",
-    accent: "#f5f5f7",
-    accentStrong: "#d4d4d8",
-    accentSoft: "#26262c",
-    mist: "#232328",
-    sand: "#1c1c20",
-  },
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -65,7 +83,7 @@ function hexValido(v: unknown): v is string {
 
 /** Aceita overrides parciais já saneados — devolve sempre uma paleta completa. */
 export function resolverTema(tier: PlanoTier, overrides?: Partial<TemaPlano> | null): TemaPlano {
-  const preset = TIER_PRESETS[tier] ?? TIER_PRESETS.platina;
+  const preset = TIER_PRESETS[tier] ?? TIER_PRESETS.standard;
   if (!overrides) return { ...preset };
   const merged = { ...preset };
   for (const [k, v] of Object.entries(overrides)) {
@@ -76,8 +94,8 @@ export function resolverTema(tier: PlanoTier, overrides?: Partial<TemaPlano> | n
 
 /** Tema final a partir do plano (preset do nível + overrides do admin). */
 export function resolverTemaPlano(plan?: Plan | null): TemaPlano {
-  if (!plan) return { ...TIER_PRESETS.platina };
-  return resolverTema(plan.tier ?? "platina", plan.tema ?? null);
+  if (!plan) return { ...TIER_PRESETS.standard };
+  return resolverTema(plan.tier ?? "standard", plan.tema ?? null);
 }
 
 /**

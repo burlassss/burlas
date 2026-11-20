@@ -2,12 +2,8 @@
 
 import { Snowflake, Nfc } from "lucide-react";
 import { cn, formatCardNumber } from "@/lib/utils";
-
-const TEXTURAS: Record<string, string> = {
-  compras: "card-texture",
-  assinaturas: "card-texture-purple",
-  viagem: "card-texture-gold",
-};
+import type { PlanoTier } from "@/lib/db/types";
+import { texturaCartao } from "@/lib/themes";
 
 export function VirtualCard({
   numero,
@@ -17,6 +13,7 @@ export function VirtualCard({
   estado,
   planNome,
   tipo,
+  tier = null,
   revelado,
   className,
 }: {
@@ -27,6 +24,8 @@ export function VirtualCard({
   estado: "ativo" | "congelado" | "cancelado" | "pendente";
   planNome: string;
   tipo: string;
+  /** Nível premium — a textura segue o nível, não o tipo. */
+  tier?: PlanoTier | null;
   revelado: boolean;
   className?: string;
 }) {
@@ -37,7 +36,7 @@ export function VirtualCard({
     <div
       className={cn(
         "card-noise relative isolate aspect-[8/5] w-full max-w-[420px] select-none overflow-hidden rounded-[1.75rem] p-5 text-cream shadow-[0_2px_4px_rgb(0_0_0/0.25),0_32px_64px_-24px_rgb(18_31_22/0.6)] ring-1 ring-white/10 transition-transform duration-300 sm:p-6",
-        TEXTURAS[tipo] ?? "card-texture",
+        texturaCartao(tier, tipo),
         congelado && "saturate-[0.35]",
         className,
       )}

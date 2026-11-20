@@ -16,7 +16,7 @@ const temaSchema = z.object({
 
 const schema = z.object({
   nome: z.string().trim().min(3).max(80).optional(),
-  tier: z.enum(["platina", "gold", "black"]).optional(),
+  tier: z.enum(["standard", "platina", "gold"]).optional(),
   tema: temaSchema.nullable().optional(),
   descricao: z.string().trim().max(400).optional(),
   taxa_ativacao_usd: z.number().min(0).max(1000).optional(),
@@ -46,7 +46,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (!parsed.success) return NextResponse.json({ erro: parsed.error.issues[0]?.message ?? "Dados inválidos." }, { status: 422 });
 
   const patch: Record<string, unknown> = { ...parsed.data };
-  const tierFinal = (parsed.data.tier ?? plan.tier ?? "platina") as PlanoTier;
+  const tierFinal = (parsed.data.tier ?? plan.tier ?? "standard") as PlanoTier;
   if (parsed.data.tema !== undefined) {
     patch.tema = parsed.data.tema === null ? null : resolverTema(tierFinal, parsed.data.tema);
   } else if (parsed.data.tier && plan.tema) {

@@ -18,7 +18,7 @@ export default async function ClienteLayout({ children }: { children: React.Reac
   // Tema da área do cliente: derivado do cartão do utilizador (nível/tier do plano)
   const cartaoAtivo = cartoes.find((c) => c.estado === "ativo") ?? cartoes[0] ?? null;
   const plano = cartaoAtivo ? await db.findPlan(cartaoAtivo.plan_id) : null;
-  const tier = plano?.tier ?? "platina";
+  const tier = plano?.tier ?? "standard";
   const tema = temaParaCssVars(resolverTemaPlano(plano)) as React.CSSProperties;
 
   return (

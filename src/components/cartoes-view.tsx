@@ -11,7 +11,9 @@ import { VirtualCard } from "@/components/virtual-card";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
 import { formatMoeda } from "@/lib/money";
-import type { PlanTipo } from "@/lib/db/types";
+import type { PlanTipo, PlanoTier } from "@/lib/db/types";
+import { TIER_INFO } from "@/lib/themes";
+import { Crown } from "lucide-react";
 
 const ICONE: Record<PlanTipo, React.ElementType> = {
   compras: ShoppingBag,
@@ -31,12 +33,14 @@ export interface PlanoResumo {
   validade_meses: number;
   beneficios: string[];
   destaque: boolean;
+  tier?: PlanoTier;
 }
 export interface CartaoExistente {
   id: string;
   plan_id: string;
   planNome: string;
   tipo: string;
+  tier?: PlanoTier | null;
   estado: "ativo" | "congelado" | "cancelado" | "pendente";
   validade: string;
   limite_mensal: number;
@@ -93,6 +97,7 @@ export function CartoesView({ planos, cartoes, saldoCents }: { planos: PlanoResu
                   estado={cartao.estado}
                   planNome={cartao.planNome}
                   tipo={cartao.tipo}
+                  tier={cartao.tier}
                   revelado={false}
                   className="max-w-xs"
                 />
@@ -117,7 +122,10 @@ export function CartoesView({ planos, cartoes, saldoCents }: { planos: PlanoResu
               <div key={plano.id} className={cn("flex flex-col rounded-3xl border p-5", plano.destaque ? "border-forest bg-forest text-cream" : "border-black/5 bg-surface")}>
                 <div className="flex items-start justify-between gap-2">
                   <Icone className={cn("h-8 w-8", plano.destaque ? "text-lime" : "text-forest")} strokeWidth={1.7} />
-                  {plano.destaque && <span className="rounded-full bg-lime px-2.5 py-1 text-[0.6rem] font-extrabold uppercase tracking-wider text-pine">Popular</span>}
+                  <span className="flex flex-col items-end gap-1">
+                    {plano.destaque && <span className="rounded-full bg-lime px-2.5 py-1 text-[0.6rem] font-extrabold uppercase tracking-wider text-pine">Popular</span>}
+                    {plano.tier && <span className={cn("flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.6rem] font-extrabold uppercase tracking-wider", plano.destaque ? "bg-white/15 text-lime" : "bg-sand text-ink/60")}><Crown className="h-3 w-3" /> {TIER_INFO[plano.tier].label}</span>}
+                  </span>
                 </div>
                 <h3 className="mt-3 text-xl font-extrabold tracking-tight">{plano.nome}</h3>
                 <p className={cn("mt-1 text-xs font-medium leading-snug", plano.destaque ? "text-cream/75" : "text-ink/60")}>{plano.descricao}</p>
