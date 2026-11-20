@@ -45,15 +45,21 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ erro: parsed.error.issues[0]?.message ?? "Dados inválidos." }, { status: 422 });
 
-  const patch: Record<string, unknown> = { ...parsed.data };
-  const tierFinal = (parsed.data.tier ?? plan.tier ?? "standard") as PlanoTier;
-  if (parsed.data.tema !== undefined) {
-    patch.tema = parsed.data.tema === null ? null : resolverTema(tierFinal, parsed.data.tema);
-  } else if (parsed.data.tier && plan.tema) {
-    // Mudou o nível mas tem paleta personalizada: re-ancora no preset do novo nível? Mantém overrides.
-    patch.tema = resolverTema(tierFinal, plan.tema);
+  try {
+    const patch: Record<string, unknown> = { ...parsed.data };
+    const tierFinal = (parsed.data.tier ?? plan.tier ?? "standard") as PlanoTier;
+    if (parsed.data.tema !== undefined) {
+      patch.tema = parsed.data.tema === null ? null : resolverTema(tierFinal, parsed.data.tema);
+    } else if (parsed.data.tier && plan.tema) {
+      patch.tema = resolverTema(tierFinal, plan.tema);
+    }
+    const atualizado = await db.updatePlan(id, patch as Parameters<typeof db.updatePlan>[1]);
+    await db.insertAudit({ ator: admin.id, acao: "plano.atualizado", entidade: "plans", entidade_id: id, dados: parsed.data });
+    return NextResponse.json({ ok: true, plano: atualizado });
+  } catch (err) {
+    console.error("[admin/planos PATCH]", err);
+    const msg = err instanceof Error ? err.message : "Erro desconhecido.";
+    const dica = /tier|tema|column|check/i.test(msg) ? " A base de dados precisa da migração 0003 (níveis standard/platina/gold). Contacta a equipa técnica." : "";
+    return NextResponse.json({ erro: `Não foi possível guardar o plano.${dica}` }, { status: 500 });
   }
-  const atualizado = await db.updatePlan(id, patch as Parameters<typeof db.updatePlan>[1]);
-  await db.insertAudit({ ator: admin.id, acao: "plano.atualizado", entidade: "plans", entidade_id: id, dados: parsed.data });
-  return NextResponse.json({ ok: true, plano: atualizado });
 }

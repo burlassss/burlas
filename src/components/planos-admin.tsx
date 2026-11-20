@@ -26,8 +26,8 @@ export function PlanosAdmin({ planos }: { planos: Plan[] }) {
       const url = plano.id ? `/api/admin/planos/${plano.id}` : "/api/admin/planos";
       const method = plano.id ? "PATCH" : "POST";
       const resp = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(plano) });
-      const data = await resp.json();
-      if (!resp.ok) { toast("erro", "Não foi possível guardar o plano", data.erro); return; }
+      const data: { erro?: string } | null = await resp.json().catch(() => null);
+      if (!resp.ok) { toast("erro", "Não foi possível guardar o plano", data?.erro ?? `Erro inesperado (${resp.status}). Tenta atualizar a página.`); return; }
       toast("sucesso", plano.id ? "Plano atualizado" : "Plano criado");
       setEditando(null);
       setCriando(false);
