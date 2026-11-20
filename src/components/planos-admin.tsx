@@ -6,7 +6,9 @@ import { Plus, Pencil, Power, Star, ShoppingBag, Repeat2, Plane, Loader2, Check 
 import { Button, Modal, Input, Label, Select, Badge } from "@/components/ui";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
-import type { Plan } from "@/lib/db/types";
+import type { Plan, PlanoTier, TemaPlano } from "@/lib/db/types";
+import { TIER_INFO, TIER_ORDEM, TIER_PRESETS } from "@/lib/themes";
+import { Crown } from "lucide-react";
 
 const ICONE: Record<string, React.ElementType> = { shopping: ShoppingBag, repeat: Repeat2, plane: Plane };
 const ICONES_DISPONIVEIS = ["shopping", "repeat", "plane"];
@@ -83,6 +85,7 @@ export function PlanosAdmin({ planos }: { planos: Plan[] }) {
                 <h3 className="text-lg font-extrabold tracking-tight text-ink">{plano.nome}</h3>
                 {!plano.ativo && <Badge tone="zinc">Inativo</Badge>}
                 {plano.destaque && <Badge tone="amber">Destaque</Badge>}
+                <Badge tone={plano.tier === "black" ? "zinc" : plano.tier === "gold" ? "amber" : "green"}><Crown className="mr-1 h-3 w-3" />{TIER_INFO[plano.tier ?? "platina"].label}</Badge>
               </div>
               <p className="mt-1 line-clamp-2 text-xs font-medium text-ink/55">{plano.descricao}</p>
               <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[0.72rem] font-semibold text-ink/70">
@@ -135,6 +138,33 @@ function FormularioPlano({
     beneficios: (Array.isArray(inicial?.beneficios) ? inicial.beneficios : []).join("\n"),
     ordem: String(inicial?.ordem ?? 1),
   });
+  const [tier, setTier] = React.useState<PlanoTier>(inicial?.tier ?? "platina");
+  const [personalizado, setPersonalizado] = React.useState<boolean>(!!inicial?.tema);
+  const [tema, setTema] = React.useState<TemaPlano>(() => inicial?.tema ?? { ...TIER_PRESETS[inicial?.tier ?? "platina"] });
+
+  function mudarTier(novo: PlanoTier) {
+    setTier(novo);
+    if (!personalizado) setTema({ ...TIER_PRESETS[novo] });
+  }
+
+  function alternarPersonalizado(ativo: boolean) {
+    setPersonalizado(ativo);
+    if (ativo) setTema((t) => ({ ...TIER_PRESETS[tier], ...t }));
+  }
+
+  const CORES: { chave: keyof TemaPlano; label: string }[] = [
+    { chave: "bg", label: "Fundo da área" },
+    { chave: "surface", label: "Cartões e painéis" },
+    { chave: "ink", label: "Texto" },
+    { chave: "primary", label: "Primário (botões, barras)" },
+    { chave: "primary2", label: "Primário claro" },
+    { chave: "primary3", label: "Primário escuro" },
+    { chave: "accent", label: "Acento (destaques)" },
+    { chave: "accentStrong", label: "Acento forte" },
+    { chave: "accentSoft", label: "Acento suave (fundos)" },
+    { chave: "mist", label: "Linhas / contornos" },
+    { chave: "sand", label: "Tons de apoio" },
+  ];
 
   function submeter(e: React.FormEvent) {
     e.preventDefault();
@@ -151,6 +181,8 @@ function FormularioPlano({
       ordem: Number(form.ordem) || 10,
       icone: form.icone,
       cor: form.cor,
+      tier,
+      tema: personalizado ? tema : null,
       beneficios: form.beneficios.split("\n").map((b) => b.trim()).filter(Boolean),
     });
   }
@@ -172,7 +204,34 @@ function FormularioPlano({
         <div><Label htmlFor="carga" hint="USD">Limite de carregamento</Label><Input id="carga" type="number" min={1} value={form.limite_carga_usd} onChange={(e) => setForm({ ...form, limite_carga_usd: e.target.value })} /></div>
         <div><Label htmlFor="valid" hint="meses">Validade</Label><Input id="valid" type="number" min={1} value={form.validade_meses} onChange={(e) => setForm({ ...form, validade_meses: e.target.value })} /></div>
         <div><Label htmlFor="ordem">Ordem</Label><Input id="ordem" type="number" min={0} value={form.ordem} onChange={(e) => setForm({ ...form, ordem: e.target.value })} /></div>
-        <div className="sm:col-span-2"><Label htmlFor="icone">Ícone</Label><Select id="icone" value={form.icone} onChange={(e) => setForm({ ...form, icone: e.target.value })}>{ICONES_DISPONIVEIS.map((i) => <option key={i} value={i}>{i}</option>)}</Select></div>
+        <div><Label htmlFor="icone">Ícone</Label><Select id="icone" value={form.icone} onChange={(e) => setForm({ ...form, icone: e.target.value })}>{ICONES_DISPONIVEIS.map((i) => <option key={i} value={i}>{i}</option>)}</Select></div>
+        <div><Label htmlFor="tier" hint="define o tema da área do cliente">Nível premium</Label><Select id="tier" value={tier} onChange={(e) => mudarTier(e.target.value as PlanoTier)}>{TIER_ORDEM.map((t) => <option key={t} value={t}>{TIER_INFO[t].label}</option>)}</Select></div>
+        <div className="sm:col-span-2 rounded-2xl border border-mist bg-sand/40 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-extrabold uppercase tracking-wide text-ink/60">Paleta do nível {TIER_INFO[tier].label}</p>
+            <div className="flex items-center gap-3">
+              {personalizado && (
+                <button type="button" onClick={() => setTema({ ...TIER_PRESETS[tier] })} className="text-[0.72rem] font-bold text-forest hover:underline">Restaurar cores do nível</button>
+              )}
+              <label className="flex cursor-pointer items-center gap-1.5 text-[0.72rem] font-bold text-ink/70">
+                <input type="checkbox" checked={personalizado} onChange={(e) => alternarPersonalizado(e.target.checked)} className="h-4 w-4 accent-[#163c2b]" />
+                Personalizar cores
+              </label>
+            </div>
+          </div>
+          {personalizado ? (
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {CORES.map(({ chave, label }) => (
+                <label key={chave} className="flex items-center gap-2 rounded-xl border border-black/5 bg-surface px-2 py-1.5">
+                  <input type="color" value={tema[chave]} onChange={(e) => setTema({ ...tema, [chave]: e.target.value })} aria-label={label} className="h-7 w-8 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0" />
+                  <span className="min-w-0"><span className="block truncate text-[0.65rem] font-bold leading-tight text-ink/70">{label}</span><span className="block text-[0.6rem] font-semibold uppercase text-ink/40">{tema[chave]}</span></span>
+                </label>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-2 text-[0.7rem] font-medium text-ink/50">{TIER_INFO[tier].descricao}</p>
+          )}
+        </div>
         <div className="sm:col-span-2"><Label htmlFor="benef" hint="um por linha">Benefícios</Label><textarea id="benef" value={form.beneficios} onChange={(e) => setForm({ ...form, beneficios: e.target.value })} rows={4} className="w-full rounded-2xl border-2 border-mist bg-surface p-3 text-sm font-medium focus:border-forest focus:outline-none" /></div>
         <Button type="submit" loading={busy} className="sm:col-span-2" size="lg"><Check className="h-5 w-5" /> Guardar alterações</Button>
       </form>

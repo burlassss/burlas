@@ -48,6 +48,24 @@ export interface SmsCode {
 
 export type PlanTipo = "compras" | "assinaturas" | "viagem";
 
+/** Nível premium do cartão — controla o tema da área do cliente. */
+export type PlanoTier = "platina" | "gold" | "black";
+
+/** Paleta completa do tema (10 cores). Todos os campos em hex #rrggbb. */
+export interface TemaPlano {
+  bg: string;
+  surface: string;
+  ink: string;
+  primary: string;
+  primary2: string;
+  primary3: string;
+  accent: string;
+  accentStrong: string;
+  accentSoft: string;
+  mist: string;
+  sand: string;
+}
+
 export interface Plan {
   id: string;
   nome: string;
@@ -67,6 +85,10 @@ export interface Plan {
   cor: string;
   icone: string;
   beneficios: string[];
+  /** Nível premium — define o tema base da área do cliente. */
+  tier: PlanoTier;
+  /** Overrides parciais/completos da paleta por defeito do nível. null = preset. */
+  tema: TemaPlano | null;
   criado_em: string;
 }
 

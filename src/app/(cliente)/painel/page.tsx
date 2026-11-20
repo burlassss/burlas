@@ -117,6 +117,7 @@ export default async function PainelPage() {
           id: card.id,
           planNome: plan?.nome ?? "Cartão MOZOUT",
           tipo: plan?.tipo ?? "compras",
+          tier: plan?.tier ?? null,
           estado: card.estado,
           validade: card.validade,
           limiteMensal: card.limite_mensal,

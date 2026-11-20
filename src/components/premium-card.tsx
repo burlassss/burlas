@@ -4,10 +4,18 @@ import React from "react";
 import { Snowflake, Nfc, Wifi, Lock } from "lucide-react";
 import { cn, formatCardNumber } from "@/lib/utils";
 
+import type { PlanoTier } from "@/lib/db/types";
+
 const TEXTURAS: Record<string, string> = {
   compras: "card-texture",
   assinaturas: "card-texture-purple",
   viagem: "card-texture-gold",
+};
+
+const TEXTURAS_TIER: Record<PlanoTier, string> = {
+  platina: "card-texture-platinum",
+  gold: "card-texture-gold",
+  black: "card-texture-black",
 };
 
 /**
@@ -25,6 +33,7 @@ export function PremiumCard({
   estado,
   planNome,
   tipo,
+  tier = null,
   revelado,
   className,
 }: {
@@ -36,6 +45,8 @@ export function PremiumCard({
   estado: "ativo" | "congelado" | "cancelado" | "pendente";
   planNome: string;
   tipo: string;
+  /** Nível premium — define a textura quando presente (tem prioridade sobre `tipo`). */
+  tier?: PlanoTier | null;
   revelado: boolean;
   className?: string;
 }) {
@@ -81,7 +92,7 @@ export function PremiumCard({
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped((v) => !v); } }}
         >
           {/* ═══════════ FRENTE ═══════════ */}
-          <div className={cn("backface-hidden card-noise absolute inset-0 overflow-hidden rounded-[1.6rem] text-cream ring-1 ring-white/15 shadow-[0_2px_6px_rgb(0_0_0/0.3),0_36px_64px_-28px_rgb(18_31_22/0.65)]", TEXTURAS[tipo] ?? "card-texture", congelado && "saturate-[0.4]")}>
+          <div className={cn("backface-hidden card-noise absolute inset-0 overflow-hidden rounded-[1.6rem] text-cream ring-1 ring-white/15 shadow-[0_2px_6px_rgb(0_0_0/0.3),0_36px_64px_-28px_rgb(18_31_22/0.65)]", (tier ? TEXTURAS_TIER[tier] : TEXTURAS[tipo] ?? "card-texture"), congelado && "saturate-[0.4]")}>
             {/* brilho exterior */}
             <div aria-hidden className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-lime/15 blur-3xl" />
             <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-white/5 blur-3xl" />
