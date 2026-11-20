@@ -5,7 +5,8 @@ import {
 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { formatMoeda, tempoRelativo } from "@/lib/money";
+import { formatMoeda } from "@/lib/money";
+import { TempoRelativo } from "@/components/tempo-relativo";
 import { VolumeChart } from "@/components/admin-charts";
 
 export const dynamic = "force-dynamic";
@@ -95,7 +96,7 @@ export default async function AdminDashboard() {
                     <span className="block font-bold text-ink">{a.acao}</span>
                     <span className="block font-medium text-ink/45">{a.entidade}{a.entidade_id ? ` · ${String(a.entidade_id).slice(0, 8)}…` : ""}</span>
                   </span>
-                  <span className="shrink-0 font-semibold text-ink/40">{tempoRelativo(a.criado_em)}</span>
+                  <span className="shrink-0 font-semibold text-ink/40"><TempoRelativo iso={a.criado_em} /></span>
                 </li>
               ))}
               {auditoria.length === 0 && <li className="text-ink/45">Sem registos ainda.</li>}

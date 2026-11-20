@@ -49,7 +49,13 @@ export default async function PainelPage() {
 
   const kyc = await estadoKyc(user.id);
   const mznEquivalente = (fromCents(saldoCents) * cx.valorEfetivo);
-  const hora = new Date().getHours();
+  // Hora em Africa/Maputo (UTC+2), explícita: `new Date().getHours()` usa o
+  // fuso do servidor (UTC na Vercel) e diverge do dispositivo do utilizador,
+  // quebrando a hidratação (React #441). Com o fuso fixo, servidor e cliente
+  // calculam a mesma saudação.
+  const hora = Number(
+    new Intl.DateTimeFormat("pt-MZ", { hour: "numeric", hour12: false, timeZone: "Africa/Maputo" }).format(new Date()),
+  );
   const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
   const primeiroNome = user.nome.trim().split(/\s+/)[0];
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { CheckCheck } from "lucide-react";
 import { MOVIMENTO_ICONES } from "./notificacao-icones";
-import { tempoRelativo } from "@/lib/money";
+import { TempoRelativo } from "@/components/tempo-relativo";
 import { cn } from "@/lib/utils";
 import type { Notification } from "@/lib/db/types";
 
@@ -51,7 +51,7 @@ export function NotificacoesLista({ itens }: { itens: Notification[] }) {
                     </span>
                   </span>
                   <span className="mt-0.5 block text-xs font-medium leading-snug text-ink/60">{n.corpo}</span>
-                  <span className="mt-1 block text-[0.62rem] font-bold uppercase tracking-wide text-ink/40">{tempoRelativo(n.criado_em)}</span>
+                  <span className="mt-1 block text-[0.62rem] font-bold uppercase tracking-wide text-ink/40"><TempoRelativo iso={n.criado_em} /></span>
                 </span>
               </button>
             </li>
