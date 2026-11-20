@@ -12,7 +12,18 @@ export const metadata: Metadata = {
   description:
     "Cria uma conta, recebe um cartão virtual internacional e financia-o com M-Pesa, e-Mola ou USDT (TRC20). Dollars na tua mão, em Moçambique.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MOZOUT-USD",
+  },
 };
 
 export const viewport: Viewport = {

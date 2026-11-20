@@ -16,6 +16,9 @@ export type NotificacaoTipo =
   | "levantamento_cancelado"
   | "nova_ordem_agente"
   | "ordem_atribuida"
+  | "kyc_submetido"
+  | "kyc_aprovado"
+  | "kyc_rejeitado"
   | "disputa_aberta"
   | "disputa_resolvida"
   | "seguranca";

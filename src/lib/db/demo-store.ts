@@ -12,9 +12,11 @@ import type {
   DepositFilter,
   Dispute,
   Fee,
+  KycSubmission,
   LedgerEntry,
   LedgerFilter,
   Notification,
+  OnboardingAnswer,
   OrderFilter,
   Plan,
   Rate,
@@ -33,6 +35,8 @@ interface DBData {
   sessions: Session[];
   smsCodes: SmsCode[];
   plans: Plan[];
+  onboarding: OnboardingAnswer[];
+  kyc: KycSubmission[];
   cards: Card[];
   ledger: LedgerEntry[];
   reservations: Reservation[];
@@ -128,10 +132,14 @@ function seed(): DBData {
     { chave: "manutencao", valor: "false" },
     { chave: "limite_deposito_dia_usd", valor: "5000" },
     { chave: "limite_levantamento_dia_usd", valor: "3000" },
+    { chave: "kyc_limite_nao_verificado_usd", valor: "2000" },
+    { chave: "kyc_limite_verificado_usd", valor: "5000" },
   ];
 
   return {
     users: [admin, agenteMpesaUser, agenteEmolaUser],
+    onboarding: [],
+    kyc: [],
     sessions: [],
     smsCodes: [],
     plans,
@@ -509,6 +517,45 @@ export class DemoStore implements DataStore {
     const s = db.settings.find((x) => x.chave === chave);
     if (s) s.valor = valor;
     else db.settings.push({ chave, valor });
+  }
+
+  // ── Onboarding & KYC ───────────────────────────────────────
+  async upsertOnboardingAnswer(userId: string, usos: string[], metodosAntes: string[]) {
+    const db = store();
+    const existing = db.onboarding.find((o) => o.user_id === userId);
+    if (existing) {
+      existing.usos = usos;
+      existing.metodos_antes = metodosAntes;
+      return clone(existing);
+    }
+    const row: OnboardingAnswer = { id: uuid(), user_id: userId, usos, metodos_antes: metodosAntes, criado_em: agora() };
+    db.onboarding.push(row);
+    return clone(row);
+  }
+  async findOnboardingAnswer(userId: string) {
+    const o = store().onboarding.find((x) => x.user_id === userId);
+    return o ? clone(o) : null;
+  }
+  async insertKycSubmission(s: Omit<KycSubmission, "id" | "criado_em" | "decidido_em" | "decidido_por" | "estado" | "motivo_recusa">) {
+    const row: KycSubmission = { ...s, id: uuid(), estado: "pendente", motivo_recusa: null, criado_em: agora(), decidido_em: null, decidido_por: null };
+    store().kyc.push(row);
+    return clone(row);
+  }
+  async listKycSubmissions(filter?: { estado?: KycSubmission["estado"] }) {
+    let rows = store().kyc;
+    if (filter?.estado) rows = rows.filter((k) => k.estado === filter.estado);
+    rows = [...rows].sort((a, b) => b.criado_em.localeCompare(a.criado_em));
+    return cloneList(rows);
+  }
+  async findLatestKycByUser(userId: string) {
+    const rows = store().kyc.filter((k) => k.user_id === userId).sort((a, b) => b.criado_em.localeCompare(a.criado_em));
+    return rows[0] ? clone(rows[0]) : null;
+  }
+  async updateKycSubmission(id: string, patch: Partial<Pick<KycSubmission, "estado" | "motivo_recusa" | "decidido_em" | "decidido_por">>) {
+    const k = store().kyc.find((x) => x.id === id);
+    if (!k) return null;
+    Object.assign(k, patch);
+    return clone(k);
   }
 
   // ── Notificações ───────────────────────────────────────────

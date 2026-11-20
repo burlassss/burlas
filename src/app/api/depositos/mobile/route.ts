@@ -19,7 +19,15 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ erro: parsed.error.issues[0]?.message ?? "Valor inválido." }, { status: 422 });
 
-  const { deposit, agente, cotacao } = await criarDepositoMobile(user, parsed.data.metodo, Math.round(parsed.data.valorMzn * 100));
+  let resultado: Awaited<ReturnType<typeof criarDepositoMobile>>;
+  try {
+    resultado = await criarDepositoMobile(user, parsed.data.metodo, Math.round(parsed.data.valorMzn * 100));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Não foi possível criar o depósito.";
+    const ehKyc = /Limite diário|limite diário/i.test(msg);
+    return NextResponse.json({ erro: msg }, { status: ehKyc ? 403 : 500 });
+  }
+  const { deposit, agente, cotacao } = resultado;
 
   const agenteUser = agente ? await db.findUserById(agente.user_id) : null;
   return NextResponse.json({

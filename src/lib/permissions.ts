@@ -24,12 +24,13 @@ export type Permissao =
   | "disputas.gerir"
   | "auditoria.ver"
   | "notificacoes.ver"
-  | "administradores.gerir";
+  | "administradores.gerir"
+  | "kyc.gerir";
 
 const TODAS: Permissao[] = [
   "dashboard.ver", "utilizadores.ver", "utilizadores.editar", "utilizadores.ajustar_saldo",
   "cartoes.gerir", "planos.gerir", "depositos.aprovar", "levantamentos.gerir", "agentes.gerir",
-  "taxas.gerir", "integracoes.ver", "disputas.gerir", "auditoria.ver", "notificacoes.ver", "administradores.gerir",
+  "taxas.gerir", "integracoes.ver", "disputas.gerir", "auditoria.ver", "notificacoes.ver", "administradores.gerir", "kyc.gerir",
 ];
 
 const MAPA: Record<Papel, Permissao[]> = {

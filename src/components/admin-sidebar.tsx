@@ -14,7 +14,7 @@ import { PAPEL_LABEL } from "@/lib/labels";
 interface ItemNav { href: string; label: string; icon: React.ElementType; permissao: Permissao; badge?: number }
 interface Secao { titulo: string; itens: ItemNav[] }
 
-export function AdminSidebar({ papel, depositosPendentes, levantamentosPendentes, disputasAbertas }: { papel: Papel; depositosPendentes: number; levantamentosPendentes: number; disputasAbertas: number }) {
+export function AdminSidebar({ papel, depositosPendentes, levantamentosPendentes, disputasAbertas, kycPendentes = 0 }: { papel: Papel; depositosPendentes: number; levantamentosPendentes: number; disputasAbertas: number; kycPendentes?: number }) {
   const pathname = usePathname();
 
   const secoes: Secao[] = [
@@ -31,6 +31,7 @@ export function AdminSidebar({ papel, depositosPendentes, levantamentosPendentes
       titulo: "Pessoas",
       itens: [
         { href: "/admin/utilizadores", label: "Utilizadores", icon: Users, permissao: "utilizadores.ver" },
+        { href: "/admin/kyc", label: "Verificação KYC", icon: ShieldCheck, permissao: "kyc.gerir", badge: kycPendentes },
         { href: "/admin/agentes", label: "Agentes", icon: Store, permissao: "agentes.gerir" },
         { href: "/admin/cartoes", label: "Cartões", icon: CreditCard, permissao: "cartoes.gerir" },
       ],

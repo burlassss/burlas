@@ -7,6 +7,7 @@ import { getFee } from "./fees";
 import { selecionarAgente } from "./agents";
 import { notificar } from "./notify";
 import { pingCliente } from "../realtime";
+import { verificarLimiteKyc } from "../kyc";
 
 /* ────────────────────────────────────────────────────────────
  * DEPÓSITOS
@@ -14,6 +15,8 @@ import { pingCliente } from "../realtime";
 
 /** Cria um pedido de depósito USDT TRC20 (aguarda pagamento on-chain). */
 export async function criarDepositoUsdt(user: User, valorUsdCents: number): Promise<Deposit> {
+  const cap = await verificarLimiteKyc(user.id, "deposito", valorUsdCents);
+  if (!cap.ok) throw new Error(cap.erro);
   const taxaPct = await getFee("deposito_usdt_pct", 0.5);
   const taxaCents = Math.round((valorUsdCents * taxaPct) / 100);
   const liquido = valorUsdCents - taxaCents;
@@ -116,7 +119,10 @@ export async function criarDepositoMobile(
   metodo: "mpesa" | "emola",
   valorMznCents: number,
 ): Promise<{ deposit: Deposit; agente: Agent | null; cotacao: CotacaoDeposito }> {
-  const q = await cotarDepositoMobile(metodo, valorMznCents);
+  const qPrev = await cotarDepositoMobile(metodo, valorMznCents);
+  const capDep = await verificarLimiteKyc(user.id, "deposito", qPrev.valorUsdCents);
+  if (!capDep.ok) throw new Error(capDep.erro);
+  const q = qPrev;
   const cx = await cotacao("USD/MZN");
   const agente = await selecionarAgente(metodo);
   const referencia = novaReferencia(metodo === "mpesa" ? "DEP-M" : "DEP-E");
@@ -272,6 +278,8 @@ export async function criarLevantamento(
   valorUsdCents: number,
   destino: string,
 ): Promise<{ ok: true; withdrawal: Withdrawal; agente: Agent | null; cotacao: CotacaoLevantamento } | { ok: false; erro: string }> {
+  const capLev = await verificarLimiteKyc(user.id, "levantamento", valorUsdCents);
+  if (!capLev.ok) return { ok: false, erro: capLev.erro };
   const q = await cotarLevantamento(metodo, valorUsdCents);
   const cx = await cotacao("USD/MZN");
   const referencia = novaReferencia(metodo === "usdt_trc20" ? "LEV-T" : metodo === "mpesa" ? "LEV-M" : "LEV-E");

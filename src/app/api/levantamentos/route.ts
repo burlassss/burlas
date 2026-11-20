@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ erro: parsed.error.issues[0]?.message ?? "Dados inválidos." }, { status: 422 });
 
   const resultado = await criarLevantamento(user, parsed.data.metodo, Math.round(parsed.data.valorUsd * 100), parsed.data.destino.replace(/\s/g, ""));
-  if (!resultado.ok) return NextResponse.json({ erro: resultado.erro }, { status: 400 });
+  if (!resultado.ok) {
+    const ehKyc = /Limite diário|limite diário/i.test(resultado.erro);
+    return NextResponse.json({ erro: resultado.erro }, { status: ehKyc ? 403 : 400 });
+  }
 
   const { withdrawal, agente, cotacao } = resultado;
   return NextResponse.json({

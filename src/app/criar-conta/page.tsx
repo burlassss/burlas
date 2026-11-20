@@ -31,7 +31,6 @@ export default function CriarContaPage() {
 
   const [form, setForm] = React.useState({ nome: "", nascimento: "", telefone: "+258 ", email: "", password: "", termos: false });
   const [telefoneConfirmado, setTelefoneConfirmado] = React.useState("");
-  const [demoCode, setDemoCode] = React.useState<string | null>(null);
   const [codigo, setCodigo] = React.useState(["", "", "", "", "", ""]);
   const [reenvioEm, setReenvioEm] = React.useState(0);
   const caixas = React.useRef<(HTMLInputElement | null)[]>([]);
@@ -54,7 +53,6 @@ export default function CriarContaPage() {
       const data = await resp.json();
       if (!resp.ok) return setErro(data.erro ?? "Não foi possível criar a conta.");
       setTelefoneConfirmado(form.telefone.replace(/\s/g, ""));
-      setDemoCode(data.demoCode ?? null);
       setPasso(2);
       setReenvioEm(30);
     } catch {
@@ -70,9 +68,7 @@ export default function CriarContaPage() {
     return () => clearInterval(t);
   }, [reenvioEm]);
 
-  async function verificar(e?: React.FormEvent) {
-    e?.preventDefault();
-    const code = codigo.join("");
+  async function verificarComCodigo(code: string) {
     if (code.length !== 6) return setErro("Introduz os 6 dígitos do código.");
     setErro(null);
     setLoading(true);
@@ -82,15 +78,20 @@ export default function CriarContaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telefone: telefoneConfirmado, codigo: code, proposito: "registo" }),
       });
-      const data = await resp.json();
-      if (!resp.ok) return setErro(data.erro ?? "Código inválido.");
-      router.push("/painel");
+      const data = await resp.json().catch(() => null);
+      if (!resp.ok) return setErro(data?.erro ?? "Código inválido.");
+      router.push("/onboarding");
       router.refresh();
     } catch {
       setErro("Erro de ligação. Tenta novamente.");
     } finally {
       setLoading(false);
     }
+  }
+
+  function verificar(e?: React.FormEvent) {
+    e?.preventDefault();
+    void verificarComCodigo(codigo.join(""));
   }
 
   async function reenviar() {
@@ -104,7 +105,6 @@ export default function CriarContaPage() {
       });
       const data = await resp.json();
       if (!resp.ok) return setErro(data.erro ?? "Não foi possível reenviar o código.");
-      setDemoCode(data.demoCode ?? null);
       setReenvioEm(30);
     } finally {
       setLoading(false);
@@ -117,7 +117,18 @@ export default function CriarContaPage() {
     novo[i] = digito;
     setCodigo(novo);
     if (digito && i < 5) caixas.current[i + 1]?.focus();
-    if (novo.every((d) => d) && novo.join("").length === 6) setTimeout(() => verificar(), 120);
+    if (novo.every((d) => d)) void verificarComCodigo(novo.join(""));
+  }
+
+  function colarCodigo(e: React.ClipboardEvent<HTMLDivElement>) {
+    const digitos = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6).split("");
+    if (digitos.length === 0) return;
+    e.preventDefault();
+    const novo = Array.from({ length: 6 }, (_, idx) => digitos[idx] ?? "");
+    setCodigo(novo);
+    const proximo = Math.min(digitos.length, 6) - 1;
+    caixas.current[Math.max(proximo, 0)]?.focus();
+    if (digitos.length >= 6) void verificarComCodigo(novo.join(""));
   }
 
   return (
@@ -210,15 +221,9 @@ export default function CriarContaPage() {
                 Enviámos um código SMS de 6 dígitos para <span className="font-extrabold text-ink">{telefoneConfirmado}</span>. Expira em 5 minutos.
               </p>
 
-              {demoCode && (
-                <div className="mt-4 rounded-2xl border border-lime-strong/40 bg-lime-soft p-3 text-center">
-                  <p className="text-[0.65rem] font-extrabold uppercase tracking-wider text-forest">Código de demonstração (SMS simulado)</p>
-                  <p className="mt-1 font-mono text-2xl font-bold tracking-[0.4em] text-forest">{demoCode}</p>
-                </div>
-              )}
 
               <form onSubmit={verificar} className="mt-6">
-                <div className="flex justify-between gap-2">
+                <div className="flex justify-between gap-2" onPaste={colarCodigo}>
                   {codigo.map((digito, i) => (
                     <input
                       key={i}

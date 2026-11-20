@@ -71,9 +71,6 @@ export async function POST(req: NextRequest) {
 
   await db.insertAudit({ ator: user.id, acao: "utilizador.registado", entidade: "users", entidade_id: user.id, dados: { email, telefone, sms: sms.ok ? (sms.simulado ? "simulado" : "enviado") : "falhou" } });
 
-  return NextResponse.json({
-    ok: true,
-    telefone,
-    ...(sms.simulado ? { demoCode: codigo } : {}),
-  });
+  // O código nunca sai na resposta (só por SMS). Em modo simulado, fica apenas nos logs do servidor.
+  return NextResponse.json({ ok: true, telefone });
 }
