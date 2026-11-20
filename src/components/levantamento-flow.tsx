@@ -8,7 +8,8 @@ import {
 import { Button, Input, Label, FieldError, Badge } from "@/components/ui";
 import { useToast } from "@/components/toast";
 import { cn, telefoneValido } from "@/lib/utils";
-import { formatMoeda, tempoRelativo } from "@/lib/money";
+import { formatMoeda } from "@/lib/money";
+import { TempoRelativo } from "@/components/tempo-relativo";
 import { ESTADO_LEVANTAMENTO, METODO_LABEL } from "@/lib/labels";
 import type { LevantamentoEstado } from "@/lib/db/types";
 
@@ -201,7 +202,7 @@ export function LevantamentoFlow({ telefoneInicial, recentes }: { telefoneInicia
                 <li key={lev.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-extrabold text-ink">{formatMoeda(Math.round(lev.valor_usd * 100), "USD")} · {lev.metodo === "mpesa" ? "M-Pesa" : lev.metodo === "emola" ? "e-Mola" : "USDT"} → {lev.destino}</p>
-                    <p className="mt-0.5 text-[0.68rem] font-semibold text-ink/45">{tempoRelativo(lev.criado_em)} · {lev.referencia}{lev.codigo_tx ? ` · TX ${lev.codigo_tx}` : ""}</p>
+                    <p className="mt-0.5 text-[0.68rem] font-semibold text-ink/45"><TempoRelativo iso={lev.criado_em} /> · {lev.referencia}{lev.codigo_tx ? ` · TX ${lev.codigo_tx}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge tone={estado?.tone ?? "zinc"}>{estado?.label ?? lev.estado}</Badge>

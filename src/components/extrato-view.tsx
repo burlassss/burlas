@@ -34,7 +34,7 @@ function grupoDe(iso: string): string {
   const ontem = new Date(Date.now() - 86400000);
   if (d.toDateString() === hoje.toDateString()) return "Hoje";
   if (d.toDateString() === ontem.toDateString()) return "Ontem";
-  return d.toLocaleDateString("pt-MZ", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString("pt-MZ", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Maputo" });
 }
 
 export function ExtratoView({ nome, itens }: { nome: string; itens: ExtratoItem[] }) {
@@ -71,7 +71,7 @@ export function ExtratoView({ nome, itens }: { nome: string; itens: ExtratoItem[
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.text(`Titular: ${nome}`, 40, 110);
-    doc.text(`Gerado em: ${new Date().toLocaleString("pt-MZ")}`, 40, 126);
+    doc.text(`Gerado em: ${new Date().toLocaleString("pt-MZ", { timeZone: "Africa/Maputo" })}`, 40, 126);
     doc.text(`Movimentos: ${filtrados.length}`, 40, 142);
 
     let y = 172;
@@ -89,7 +89,7 @@ export function ExtratoView({ nome, itens }: { nome: string; itens: ExtratoItem[
     doc.setFont("helvetica", "normal");
     for (const item of filtrados) {
       if (y > 800) { doc.addPage(); y = 48; }
-      const data = new Date(item.criado_em).toLocaleDateString("pt-MZ", { day: "2-digit", month: "2-digit", year: "2-digit" });
+      const data = new Date(item.criado_em).toLocaleDateString("pt-MZ", { day: "2-digit", month: "2-digit", year: "2-digit", timeZone: "Africa/Maputo" });
       const desc = doc.splitTextToSize(item.descricao || TIPO_MOVIMENTO[item.tipo] || item.tipo, 200);
       const valor = `${item.valor >= 0 ? "+" : ""}$${Math.abs(item.valor).toFixed(2)}`;
       doc.text(data, 40, y);

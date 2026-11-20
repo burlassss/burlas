@@ -9,7 +9,8 @@ import {
 import { Button, Input, Badge, EmptyState } from "@/components/ui";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
-import { formatMoeda, tempoRelativo } from "@/lib/money";
+import { formatMoeda } from "@/lib/money";
+import { TempoRelativo } from "@/components/tempo-relativo";
 
 export interface OrdemView {
   id: string;
@@ -201,7 +202,7 @@ export function AgentePanel({ stats, pendentes, historico }: { stats: AgenteStat
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-ink">{o.tipo === "deposito" ? "Depósito" : "Levantamento"} · {o.deposito?.referencia ?? o.levantamento?.referencia}</p>
-                  <p className="text-[0.68rem] font-semibold text-ink/45">{tempoRelativo(o.criado_em)}</p>
+                  <p className="text-[0.68rem] font-semibold text-ink/45"><TempoRelativo iso={o.criado_em} /></p>
                 </div>
                 <Badge tone={o.estado === "concluida" ? "green" : "zinc"}>{o.estado}</Badge>
               </li>
@@ -276,7 +277,7 @@ function OrdemCard({
           </span>
           <div>
             <p className="text-sm font-extrabold text-ink">{isDeposito ? "Depósito para verificar" : "Levantamento para pagar"}</p>
-            <p className="font-mono text-[0.66rem] font-bold text-ink/45">{dep?.referencia ?? lev?.referencia} · {tempoRelativo(ordem.criado_em)}</p>
+            <p className="font-mono text-[0.66rem] font-bold text-ink/45">{dep?.referencia ?? lev?.referencia} · <TempoRelativo iso={ordem.criado_em} /></p>
           </div>
         </div>
         <div className="flex items-center gap-2">

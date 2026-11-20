@@ -58,16 +58,33 @@ export function formatUnits(valor: number, moeda: Moeda = "USD"): string {
   return `${sinal}$${abs}`;
 }
 
+/**
+ * Fuso horário da aplicação (Moçambique, UTC+2, sem horário de verão).
+ * Tem de ser explícito em TODA a formatação de datas/horas: o servidor
+ * (Vercel) corre em UTC e o dispositivo do utilizador em Africa/Maputo —
+ * sem `timeZone`, o mesmo instante formata-se 2h diferente no servidor e
+ * no cliente, o que quebra a hidratação do React (#441).
+ */
+export const FUSO = "Africa/Maputo";
+
 export function formatDataHora(iso: string | Date): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
-  return d.toLocaleString("pt-MZ", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString("pt-MZ", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: FUSO });
 }
 
 export function formatDataCurta(iso: string | Date): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
-  return d.toLocaleDateString("pt-MZ", { day: "2-digit", month: "short", year: "numeric" });
+  return d.toLocaleDateString("pt-MZ", { day: "2-digit", month: "short", year: "numeric", timeZone: FUSO });
 }
 
+/**
+ * Tempo relativo ("há 5 min", "ontem", …).
+ * ATENÇÃO: usa `Date.now()`, por isso o resultado difere entre o render do
+ * servidor e a hidratação no cliente. NUNCA chamar isto no caminho de
+ * renderização — usar o componente `<TempoRelativo>` (client-only), que
+ * mostra a data absoluta no primeiro paint e troca para o relativo após
+ * a montagem, sem mismatch de hidratação.
+ */
 export function tempoRelativo(iso: string | Date): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
   const diff = Date.now() - d.getTime();
