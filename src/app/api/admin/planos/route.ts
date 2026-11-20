@@ -45,13 +45,20 @@ export async function POST(req: NextRequest) {
   const existe = await db.findPlanBySlug(parsed.data.slug);
   if (existe) return NextResponse.json({ erro: "Já existe um plano com este slug." }, { status: 409 });
 
-  const { tier, tema, ...rest } = parsed.data;
-  const plan = await db.insertPlan({
-    ...rest,
-    tier,
-    tema: tema ? resolverTema(tier, tema) : null, // paleta completa resolvida
-    imagem: null,
-  });
-  await db.insertAudit({ ator: admin.id, acao: "plano.criado", entidade: "plans", entidade_id: plan.id, dados: { slug: plan.slug } });
-  return NextResponse.json({ ok: true, plano: plan });
+  try {
+    const { tier, tema, ...rest } = parsed.data;
+    const plan = await db.insertPlan({
+      ...rest,
+      tier,
+      tema: tema ? resolverTema(tier, tema) : null, // paleta completa resolvida
+      imagem: null,
+    });
+    await db.insertAudit({ ator: admin.id, acao: "plano.criado", entidade: "plans", entidade_id: plan.id, dados: { slug: plan.slug } });
+    return NextResponse.json({ ok: true, plano: plan });
+  } catch (err) {
+    console.error("[admin/planos POST]", err);
+    const msg = err instanceof Error ? err.message : "Erro desconhecido.";
+    const dica = /tier|tema|column/i.test(msg) ? " A base de dados precisa da migração 0003 (níveis standard/platina/gold). Contacta a equipa técnica." : "";
+    return NextResponse.json({ erro: `Não foi possível criar o plano.${dica}` }, { status: 500 });
+  }
 }
