@@ -42,14 +42,28 @@ export async function enviarSms(destino: string, texto: string): Promise<SmsResu
       body: JSON.stringify({ source_addr: remetente, to: destino.replace(/[^+\d]/g, "").replace(/^\+/, ""), message: texto }),
       signal: AbortSignal.timeout(8000),
     });
-    if (!resp.ok) {
-      const corpo = await resp.text().catch(() => "");
-      console.error(`[Notifica] HTTP ${resp.status}: ${corpo}`);
-      return { ok: false, simulado: false, erro: `HTTP ${resp.status}` };
-    }
-    const data = (await resp.json().catch(() => ({}))) as Record<string, unknown>;
-    if (data.success === false) {
-      const erro = typeof data.message === "string" ? data.message : "A API Notifica recusou o envio.";
+    const raw = await resp.text().catch(() => "");
+    let data: Record<string, unknown> = {};
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") data = parsed as Record<string, unknown>;
+    } catch { /* respostas não JSON são tratadas abaixo */ }
+    if (!resp.ok || data.success === false) {
+      const detalhe = [data.message, data.error, data.errors]
+        .map((x) => typeof x === "string" ? x : x ? JSON.stringify(x) : "")
+        .filter(Boolean).join(" · ").slice(0, 400);
+      const status = resp.status;
+      const dica = status === 401 || status === 403
+        ? "Confirma que o token é válido e tem permissão para SMS."
+        : status === 422 || status === 400
+          ? "Confirma o Sender ID aprovado e o número em formato internacional (+258…)."
+          : status === 429
+            ? "A Notifica aplicou limite de envio; espera e tenta novamente."
+            : status >= 500
+              ? "A API Notifica está temporariamente indisponível."
+              : "Confirma o endpoint, o token e o Sender ID no painel.";
+      const erro = `Notifica HTTP ${status}${detalhe ? `: ${detalhe}` : "."} ${dica}`;
+      console.error(`[Notifica] envio falhou (HTTP ${status}): ${detalhe || "sem mensagem do fornecedor"}`);
       return { ok: false, simulado: false, erro };
     }
     const nested = data.data && typeof data.data === "object" ? data.data as Record<string, unknown> : {};
