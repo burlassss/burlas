@@ -11,10 +11,21 @@ export interface SmsResult {
   erro?: string;
 }
 
+export async function configuracaoNotifica() {
+  const settings = await (await import("@/lib/db")).db.listSettings();
+  const get = (key: string) => settings.find((s) => s.chave === `notifica_${key}`)?.valor;
+  const tokenGuardado = get("token");
+  const { decryptSecret } = await import("@/lib/crypto");
+  const tokenEnv = (process.env.NOTIFICA_API_TOKEN || process.env.NOTIFICA_API_KEY)?.trim();
+  return {
+    token: tokenEnv || (tokenGuardado ? decryptSecret(tokenGuardado) : ""),
+    apiUrl: process.env.NOTIFICA_API_URL?.trim() || get("url")?.trim() || "https://api.notifica.co.mz/api/v1/sms/send",
+    remetente: (process.env.NOTIFICA_REMETENTE || process.env.NOTIFICA_SENDER)?.trim() || get("remetente")?.trim() || "MOZOUT",
+  };
+}
+
 export async function enviarSms(destino: string, texto: string): Promise<SmsResult> {
-  const token = (process.env.NOTIFICA_API_TOKEN || process.env.NOTIFICA_API_KEY)?.trim();
-  const apiUrl = process.env.NOTIFICA_API_URL?.trim() || "https://api.notifica.co.mz/api/v1/sms/send";
-  const remetente = (process.env.NOTIFICA_REMETENTE || process.env.NOTIFICA_SENDER)?.trim() || "MOZOUT";
+  const { token, apiUrl, remetente } = await configuracaoNotifica();
 
   if (!token) {
     console.info(`[SMS simulado] para ${destino}: ${texto}`);

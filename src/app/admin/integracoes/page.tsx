@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { Badge } from "@/components/ui";
 import { TestarSmsButton } from "@/components/integracoes-actions";
 import { dataMode } from "@/lib/db";
+import { configuracaoNotifica } from "@/lib/integrations/notifica";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Integrações" };
@@ -20,7 +21,8 @@ interface Integracao {
 export default async function AdminIntegracoesPage() {
   await requireAdmin();
   const modo = dataMode();
-  const temNotifica = !!(process.env.NOTIFICA_API_TOKEN || process.env.NOTIFICA_API_KEY)?.trim();
+  const configNotifica = await configuracaoNotifica();
+  const temNotifica = !!configNotifica.token;
   const temNowPayments = !!process.env.NOWPAYMENTS_API_KEY?.trim();
   const temEmissora = process.env.CARD_ISSUER === "stripe" || process.env.CARD_ISSUER === "marqeta";
 

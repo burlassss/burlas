@@ -1,16 +1,20 @@
-import { BellRing, ScrollText, Users } from "lucide-react";
+import { BellRing } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Badge, EmptyState } from "@/components/ui";
 import { ReenviarButton } from "@/components/notificacoes-admin";
 import { formatDataHora } from "@/lib/money";
+import { NotificaManager } from "@/components/notifica-manager";
+import { configuracaoNotifica } from "@/lib/integrations/notifica";
+import { temPermissao } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Notificações" };
 
 export default async function AdminNotificacoesPage() {
-  await requireAdmin();
-  const notificacoes = (await db.listAllNotifications()).slice(0, 60);
+  const admin = await requireAdmin();
+  const [notificacoesTodas, config] = await Promise.all([db.listAllNotifications(), configuracaoNotifica()]);
+  const notificacoes = notificacoesTodas.slice(0, 60);
   const utilizadores = await db.listUsers();
   const nomePorId = new Map(utilizadores.map((u) => [u.id, u.nome]));
 
@@ -20,6 +24,8 @@ export default async function AdminNotificacoesPage() {
         <h1 className="text-2xl font-extrabold tracking-[-0.03em] text-forest">Notificações enviadas</h1>
         <p className="mt-0.5 text-sm font-medium text-ink/55">Registo de tudo o que o sistema enviou — com opção de reenvio de SMS falhados.</p>
       </div>
+
+      {temPermissao(admin.papel, "integracoes.ver") && <NotificaManager initial={{ apiUrl: config.apiUrl, senderId: config.remetente, configured: Boolean(config.token), tokenConfigured: Boolean(config.token), source: process.env.NOTIFICA_API_TOKEN || process.env.NOTIFICA_API_KEY ? "environment" : "panel" }} />}
 
       {notificacoes.length === 0 ? (
         <EmptyState icon={<BellRing className="h-6 w-6 text-forest" />} title="Sem notificações" description="Os disparos de OTP, alertas e avisos aparecem aqui." />
