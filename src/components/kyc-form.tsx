@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import {
-  Check, ShieldCheck, BadgeCheck, ArrowRight, Upload, Camera, IdCard, BookOpen, Car, ArrowLeft,
+  ShieldCheck, BadgeCheck, ArrowRight, Upload, Camera, IdCard, BookOpen, Car, ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { Button, FieldError } from "@/components/ui";
@@ -87,10 +86,12 @@ export function KycSucesso({ compact }: { compact?: boolean }) {
   );
 }
 
-export function KycForm({ onSucesso, onVoltar }: { onSucesso?: () => void; onVoltar?: () => void }) {
+export function KycForm({ onSucesso, onVoltar, nomeInicial = "", nascimentoInicial = "" }: { onSucesso?: () => void; onVoltar?: () => void; nomeInicial?: string; nascimentoInicial?: string }) {
   const { toast } = useToast();
   const [tipoDoc, setTipoDoc] = React.useState<"bi" | "passaporte" | "carta_conducao">("bi");
   const [numeroDoc, setNumeroDoc] = React.useState("");
+  const [nomeCompleto, setNomeCompleto] = React.useState(nomeInicial);
+  const [dataNascimento, setDataNascimento] = React.useState(nascimentoInicial.slice(0, 10));
   const [frente, setFrente] = React.useState<string | null>(null);
   const [verso, setVerso] = React.useState<string | null>(null);
   const [selfie, setSelfie] = React.useState<string | null>(null);
@@ -102,14 +103,17 @@ export function KycForm({ onSucesso, onVoltar }: { onSucesso?: () => void; onVol
   async function submeterKyc(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
+    if (nomeCompleto.trim().length < 3) return setErro("Indica o teu nome completo.");
+    if (!dataNascimento) return setErro("Indica a tua data de nascimento.");
     if (!frente) return setErro("Envia a frente do documento.");
     if (precisaVerso && !verso) return setErro("Envia o verso do documento.");
+    if (!selfie) return setErro("A selfie é obrigatória para confirmar a tua identidade.");
     setLoading(true);
     try {
       const resp = await fetch("/api/kyc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tipo_documento: tipoDoc, numero_documento: numeroDoc, frente, verso, selfie }),
+        body: JSON.stringify({ nome_completo: nomeCompleto.trim(), data_nascimento: dataNascimento, tipo_documento: tipoDoc, numero_documento: numeroDoc, frente, verso, selfie }),
       });
       const data = await resp.json().catch(() => null);
       if (!resp.ok) return setErro(data?.erro ?? "Não foi possível enviar os documentos.");
@@ -124,6 +128,14 @@ export function KycForm({ onSucesso, onVoltar }: { onSucesso?: () => void; onVol
 
   return (
     <form onSubmit={submeterKyc} className="flex flex-col gap-4">
+      <section className="rounded-2xl border border-forest/10 bg-sand/35 p-4">
+        <h3 className="mb-3 text-sm font-extrabold text-forest">Dados pessoais</h3>
+        <label htmlFor="kyc-nome" className="text-[0.72rem] font-extrabold uppercase tracking-wide text-ink/55">Nome completo</label>
+        <input id="kyc-nome" required minLength={3} maxLength={120} value={nomeCompleto} onChange={(e) => setNomeCompleto(e.target.value)} autoComplete="name" className="mt-1 h-12 w-full rounded-xl border-2 border-mist bg-surface px-4 text-sm font-semibold focus:border-forest focus:outline-none" />
+        <label htmlFor="kyc-nascimento" className="mt-3 block text-[0.72rem] font-extrabold uppercase tracking-wide text-ink/55">Data de nascimento</label>
+        <input id="kyc-nascimento" required type="date" value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)} autoComplete="bday" className="mt-1 h-12 w-full rounded-xl border-2 border-mist bg-surface px-4 text-sm font-semibold focus:border-forest focus:outline-none" />
+        <p className="mt-1 text-[0.68rem] font-medium text-ink/50">A idade é calculada automaticamente a partir da data de nascimento.</p>
+      </section>
       <div>
         <p className="text-[0.72rem] font-extrabold uppercase tracking-wide text-ink/55">Tipo de documento</p>
         <div className="mt-1.5 grid grid-cols-3 gap-2">
@@ -163,7 +175,7 @@ export function KycForm({ onSucesso, onVoltar }: { onSucesso?: () => void; onVol
 
       <UploadBox label={tipoDoc === "passaporte" ? "Página principal" : "Frente do documento"} obrigatorio valor={frente} onChange={setFrente} icon={IdCard} />
       {precisaVerso && <UploadBox label="Verso do documento" obrigatorio valor={verso} onChange={setVerso} icon={IdCard} />}
-      <UploadBox label="Selfie (opcional)" valor={selfie} onChange={setSelfie} icon={Camera} />
+      <UploadBox label="Selfie para confirmação de identidade" obrigatorio valor={selfie} onChange={setSelfie} icon={Camera} />
 
       <FieldError>{erro}</FieldError>
       <div className="flex items-center gap-3">

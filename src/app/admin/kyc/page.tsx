@@ -48,7 +48,7 @@ export default async function AdminKycPage({ searchParams }: { searchParams: Pro
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-extrabold tracking-[-0.03em] text-forest">Verificação de identidade (KYC)</h1>
-        <p className="mt-0.5 text-sm font-medium text-ink/55">Revê os documentos submetidos. Aprovar desbloqueia o limite máximo do cliente.</p>
+        <p className="mt-0.5 text-sm font-medium text-ink/55">Revê os dados pessoais e os documentos submetidos para concluir a verificação.</p>
       </div>
 
       {/* Tabs */}
@@ -87,6 +87,7 @@ export default async function AdminKycPage({ searchParams }: { searchParams: Pro
                     <Badge tone={s.estado === "aprovada" ? "green" : s.estado === "rejeitada" ? "red" : "amber"}>{s.estado}</Badge>
                   </div>
                   <p className="mt-1 text-xs font-semibold text-ink/55">{doc.label} · nº <span className="font-mono">{s.numero_documento}</span> · {u?.email} · {u?.telefone} · submetido {formatDataHora(s.criado_em)}</p>
+                  {(s.nome_completo || s.data_nascimento) && <p className="mt-1 text-xs font-semibold text-ink/70">Dados declarados: {s.nome_completo ?? u?.nome ?? "—"} · nascimento {s.data_nascimento ?? "—"}</p>}
                   {s.motivo_recusa && <p className="mt-1 text-xs font-semibold text-red-600">Motivo da recusa: {s.motivo_recusa}</p>}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {[["Frente", frente], ["Verso", verso], ["Selfie", selfie]].map(([label, src]) =>

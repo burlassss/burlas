@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   await notificar(
     sub.user_id,
     parsed.data.acao === "aprovar"
-      ? { tipo: "kyc_aprovado", titulo: "Identidade verificada", corpo: "A tua identidade foi verificada. O teu limite diário foi aumentado." }
+      ? { tipo: "kyc_aprovado", titulo: "Identidade verificada", corpo: "A tua verificação de identidade foi concluída com sucesso." }
       : { tipo: "kyc_rejeitado", titulo: "Verificação recusada", corpo: `Motivo: ${parsed.data.motivo!.trim()}. Podes corrigir e submeter novamente.` },
   );
   await db.insertAudit({ ator: admin.id, acao: parsed.data.acao === "aprovar" ? "kyc.aprovado" : "kyc.rejeitado", entidade: "kyc_submissions", entidade_id: id, dados: { motivo: parsed.data.motivo ?? null } });

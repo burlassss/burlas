@@ -50,8 +50,8 @@ export async function verificarLimiteKyc(
   if (movido + valorCents > cap) {
     const limiteTxt = `$${(cap / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
     const msg = estado === "verificado"
-      ? `Atingiste o teu limite diário de ${limiteTxt}.`
-      : `Limite diário de ${limiteTxt} para contas não verificadas. Verifica a tua identidade para aumentar o limite.`;
+      ? `Atingiste o limite de ${limiteTxt}.`
+      : `O limite atual é ${limiteTxt}. Envia a verificação de identidade para análise.`;
     return { ok: false, estado, erro: msg };
   }
   return { ok: true, estado };

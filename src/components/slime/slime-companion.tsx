@@ -89,7 +89,7 @@ export function SlimeCompanion() {
   const [expressao, setExpressao] = React.useState<Expressao>("idle");
   const [aPiscar, setAPiscar] = React.useState(false);
   const [painelAberto, setPainelAberto] = React.useState(false);
-  const [somLigado, setSomLigado] = React.useState(false);
+  const [somLigado] = React.useState(false);
   const [hint, setHint] = React.useState<Hint | null>(null);
   const [particulas, setParticulas] = React.useState<Particula[]>([]);
   const [tamanho, setTamanho] = React.useState(104);
@@ -505,17 +505,6 @@ export function SlimeCompanion() {
     if (somLigado) tocarSom("pop");
   }, [hint, somLigado]);
 
-  /* ── Persistência da preferência de ocultar ── */
-  const ocultarParaSempre = React.useCallback(() => {
-    try {
-      window.localStorage.setItem("mozout:slime:hidden", "1");
-    } catch {
-      // ignore
-    }
-    setPainelAberto(false);
-    setHint(null);
-    setVisivel(false);
-  }, []);
 
   const bochechas = expressao === "happy" || expressao === "proud" || expressao === "surprised";
   const olhosFechados = expressao === "proud" ? 0.62 : expressao === "sleepy" ? 0.55 : 1;
@@ -698,10 +687,7 @@ export function SlimeCompanion() {
       {/* ── Painel de assistência ── */}
       <SlimeAssistant
         aberto={painelAberto}
-        somLigado={somLigado}
-        onAlternarSom={() => setSomLigado((v) => !v)}
         onFechar={() => setPainelAberto(false)}
-        onOcultarParaSempre={ocultarParaSempre}
       />
     </>
   );
