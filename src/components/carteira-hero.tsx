@@ -51,6 +51,30 @@ export function CarteiraHero({
   const [busy, setBusy] = React.useState<string | null>(null);
   const [detalhesAberto, setDetalhesAberto] = React.useState(false);
   const [copiado, setCopiado] = React.useState(false);
+  const [taxaLive, setTaxaLive] = React.useState(cotacao);
+  const [variacaoTaxa, setVariacaoTaxa] = React.useState<"alta" | "baixa" | null>(null);
+
+  // Actualiza a cotação verdadeira (configurada pela administração), sem simular flutuações.
+  React.useEffect(() => {
+    let anterior = cotacao;
+    const atualizar = async () => {
+      try {
+        const r = await fetch("/api/cotacao", { cache: "no-store" });
+        if (!r.ok) return;
+        const d = await r.json() as { valor: number };
+        if (!Number.isFinite(d.valor)) return;
+        if (d.valor !== anterior) {
+          setVariacaoTaxa(d.valor > anterior ? "alta" : "baixa");
+          anterior = d.valor;
+          setTaxaLive(d.valor);
+          window.setTimeout(() => setVariacaoTaxa(null), 2200);
+        }
+      } catch { /* mantém a última cotação disponível */ }
+    };
+    void atualizar();
+    const id = window.setInterval(() => void atualizar(), 30_000);
+    return () => window.clearInterval(id);
+  }, [cotacao]);
 
   async function obterDados() {
     if (!cartao) return null;
@@ -192,7 +216,7 @@ export function CarteiraHero({
           </p>
           <p className="mt-1.5 text-xs font-semibold text-cream/60 sm:text-sm">
             {visivel ? (
-              <>≈ MT {mznEquivalente.toLocaleString("pt-MZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · a 1 USD = MT {cotacao.toFixed(2)}</>
+              <>≈ MT {(cotacao > 0 ? mznEquivalente * taxaLive / cotacao : mznEquivalente).toLocaleString("pt-MZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · 1 USD = MT {taxaLive.toFixed(2)}</>
             ) : "≈ MT ••••••••"}
           </p>
 
@@ -200,8 +224,11 @@ export function CarteiraHero({
           <div className="mt-4 grid grid-cols-2 gap-2">
             <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 min-[380px]:p-3 sm:p-3.5">
               <p className="flex items-center gap-1.5 text-[0.52rem] font-extrabold uppercase tracking-[0.18em] text-lime/80 sm:text-[0.58rem]"><ArrowLeftRight className="h-3.5 w-3.5" /> Câmbio do dia</p>
-              <p className="mt-1.5 truncate [font-size:clamp(0.7rem,3.7vw,0.875rem)] sm:text-base font-extrabold tabular-nums text-cream">1 USD = MT {cotacao.toFixed(2)}</p>
-              <p className="text-[0.6rem] font-bold text-cream/50 sm:text-[0.65rem]">margem {margemPct.toFixed(2)}%</p>
+              <p aria-live="polite" className={`mt-1.5 flex items-center gap-1 whitespace-nowrap [font-size:clamp(0.7rem,3.7vw,0.95rem)] sm:text-base font-extrabold tabular-nums transition-colors duration-500 ${variacaoTaxa === "alta" ? "text-emerald-300" : variacaoTaxa === "baixa" ? "text-rose-300" : "text-cream"}`}>
+                <span>1 USD = MT {taxaLive.toFixed(2)}</span>
+                {variacaoTaxa && <span className="text-[0.65rem]" aria-label={variacaoTaxa === "alta" ? "Cotação subiu" : "Cotação desceu"}>{variacaoTaxa === "alta" ? "▲" : "▼"}</span>}
+              </p>
+              <p className="text-[0.6rem] font-bold text-cream/50 sm:text-[0.65rem]">Atualização automática · margem {margemPct.toFixed(2)}%</p>
             </div>
             <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 min-[380px]:p-3 sm:p-3.5">
               <p className="flex items-center gap-1.5 text-[0.52rem] font-extrabold uppercase tracking-[0.18em] text-lime/80 sm:text-[0.58rem]"><Lock className="h-3.5 w-3.5" /> Reservado</p>

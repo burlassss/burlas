@@ -299,6 +299,8 @@ export type KycEstado = "pendente" | "aprovada" | "rejeitada";
 export interface KycSubmission {
   id: string;
   user_id: string;
+  nome_completo: string | null;
+  data_nascimento: string | null;
   tipo_documento: KycDocumento;
   numero_documento: string;
   frente_url: string | null;

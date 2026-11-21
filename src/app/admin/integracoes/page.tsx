@@ -20,7 +20,7 @@ interface Integracao {
 export default async function AdminIntegracoesPage() {
   await requireAdmin();
   const modo = dataMode();
-  const temNotifica = !!process.env.NOTIFICA_API_TOKEN?.trim();
+  const temNotifica = !!(process.env.NOTIFICA_API_TOKEN || process.env.NOTIFICA_API_KEY)?.trim();
   const temNowPayments = !!process.env.NOWPAYMENTS_API_KEY?.trim();
   const temEmissora = process.env.CARD_ISSUER === "stripe" || process.env.CARD_ISSUER === "marqeta";
 
@@ -39,7 +39,7 @@ export default async function AdminIntegracoesPage() {
       descricao: "Envio de SMS: OTP, aprovações, levantamentos, alertas de segurança",
       ok: temNotifica,
       configurada: temNotifica,
-      detalhe: temNotifica ? "Token ativo · entrega em segundos" : "Sem NOTIFICA_API_KEY — SMS ficam registados no log do servidor",
+      detalhe: temNotifica ? "Token API ativo · endpoint SMS Notifica" : "Sem NOTIFICA_API_TOKEN — SMS de teste são simulados e registados no log do servidor",
       icone: Smartphone,
       erroRecente: null,
     },
@@ -99,7 +99,7 @@ export default async function AdminIntegracoesPage() {
           {[
             "Preencher SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SUPABASE_URL e ANON_KEY",
             "Executar supabase/migrations/0001_init.sql e seed.sql",
-            "Definir NOTIFICA_API_KEY e NOTIFICA_SENDER",
+            "Definir NOTIFICA_API_TOKEN e NOTIFICA_REMETENTE (Sender ID ativo na Notifica)",
             "Definir NOWPAYMENTS_API_KEY e NOWPAYMENTS_IPN_SECRET",
             "Apontar o IPN do NOWPayments para /api/webhooks/nowpayments",
             "Rodar SESSION_SECRET e definir NEXT_PUBLIC_APP_URL com https",

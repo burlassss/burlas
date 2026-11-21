@@ -20,7 +20,7 @@ export default async function KycPage() {
           <BadgeCheck className="h-8 w-8 text-forest" strokeWidth={1.8} />
         </span>
         <h2 className="mt-4 text-2xl font-extrabold tracking-[-0.03em] text-forest">Identidade verificada</h2>
-        <p className="mx-auto mt-2 max-w-sm text-sm font-medium text-ink/60">A tua identidade está verificada. Estás com o limite máximo diário ativo.</p>
+        <p className="mx-auto mt-2 max-w-sm text-sm font-medium text-ink/60">A tua identidade está verificada. A verificação foi concluída com sucesso.</p>
         <Link href="/painel" className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-forest px-6 text-base font-extrabold text-lime hover:bg-moss">Ir para o painel <ArrowRight className="h-5 w-5" /></Link>
       </div>
     );
@@ -43,16 +43,16 @@ export default async function KycPage() {
           {ultima?.motivo_recusa && <p className="mt-1.5 text-sm font-medium text-red-700/90">Motivo: {ultima.motivo_recusa}</p>}
           <p className="mt-1.5 text-xs font-semibold text-red-700/80">Corrige os documentos e submete novamente.</p>
         </div>
-        <KycForm />
+        <KycForm nomeInicial={user.nome} nascimentoInicial={user.nascimento} />
       </div>
     );
   } else {
     corpo = (
       <div className="flex flex-col gap-4">
         <div className="rounded-2xl border border-forest/15 bg-lime-soft p-4 text-sm font-semibold text-forest/90">
-          Sem verificação, o limite diário é de <strong>$2.000 USD</strong>. Verifica a tua identidade para subir para <strong>$5.000 USD</strong>.
+          O limite atual da tua conta é <strong>$2.000 USD</strong>. Envia os teus dados e documentos para verificação de identidade.
         </div>
-        <KycForm />
+        <KycForm nomeInicial={user.nome} nascimentoInicial={user.nascimento} />
       </div>
     );
   }

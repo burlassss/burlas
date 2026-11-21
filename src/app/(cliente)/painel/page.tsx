@@ -125,7 +125,7 @@ export default async function PainelPage() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[0.8rem] font-extrabold leading-snug text-forest">{kyc === "pendente" ? "Verificação em análise" : kyc === "rejeitada" ? "Verificação recusada — corrige e reenvia" : "Verifica a tua identidade"}</p>
-            <p className="mt-0.5 text-[0.68rem] font-semibold leading-snug text-forest/80">{kyc === "pendente" ? "A avisar-te assim que a decisão sair." : "Sem verificação o limite diário é $2.000 USD — com KYC sobe para $5.000 USD."}</p>
+            <p className="mt-0.5 text-[0.68rem] font-semibold leading-snug text-forest/80">{kyc === "pendente" ? "A avisar-te assim que a decisão sair." : "O limite atual da conta é $2.000 USD. Envia os teus dados para verificação de identidade."}</p>
           </div>
           <ArrowRight className="h-5 w-5 shrink-0 text-forest transition-transform group-hover:translate-x-0.5" />
         </Link>
