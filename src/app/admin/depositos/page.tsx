@@ -11,7 +11,8 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Depósitos" };
 
 const ABAS = [
-  { id: "pendente_analise", label: "Por aprovar" },
+  { id: "pendente_analise", label: "À espera do agente" },
+  { id: "aguardando_confirmacoes", label: "Agente confirmou · aprovar" },
   { id: "aprovado", label: "Aprovados" },
   { id: "recusado", label: "Recusados" },
   { id: "", label: "Todos" },
@@ -20,7 +21,7 @@ const ABAS = [
 export default async function AdminDepositosPage({ searchParams }: { searchParams: Promise<{ estado?: string }> }) {
   await requireAdmin();
   const { estado } = await searchParams;
-  const filtro = estado && ["pendente_analise", "aprovado", "recusado", "cancelado", "expirado"].includes(estado) ? estado : undefined;
+  const filtro = estado && ["pendente_analise", "aguardando_confirmacoes", "aprovado", "recusado", "cancelado", "expirado"].includes(estado) ? estado : undefined;
   const mostrarTodos = estado === "todos";
   const depositos = await db.listDeposits({ estado: mostrarTodos ? undefined : filtro ?? "pendente_analise", limit: 100 });
   const utilizadores = await db.listUsers();
@@ -83,8 +84,8 @@ export default async function AdminDepositosPage({ searchParams }: { searchParam
                     <td className="px-5 py-3.5"><Badge tone={estadoMeta?.tone ?? "zinc"}>{estadoMeta?.label ?? d.estado}</Badge></td>
                     <td className="px-5 py-3.5 text-xs font-semibold text-ink/55">{formatDataHora(d.criado_em)}</td>
                     <td className="px-5 py-3.5">
-                      {d.estado === "pendente_analise" ? (
-                        <DepositoAcoes deposito={{ id: d.id, referencia: d.referencia, valor_mzn: d.valor_mzn, valor_liquido_usd: d.valor_liquido_usd, metodo: d.metodo, codigo_tx: d.codigo_tx, criado_em: d.criado_em, utilizador_nome: nomePorId.get(d.user_id), agente_nome: d.agent_id ? agentePorId.get(d.agent_id) : d.metodo === "usdt_trc20" ? "TRC20 (automático)" : null }} />
+                      {["pendente_analise", "aguardando_confirmacoes"].includes(d.estado) ? (
+                        <DepositoAcoes podeAprovar={d.estado === "aguardando_confirmacoes" || d.metodo === "usdt_trc20"} deposito={{ id: d.id, referencia: d.referencia, valor_mzn: d.valor_mzn, valor_liquido_usd: d.valor_liquido_usd, metodo: d.metodo, codigo_tx: d.codigo_tx, criado_em: d.criado_em, utilizador_nome: nomePorId.get(d.user_id), agente_nome: d.agent_id ? agentePorId.get(d.agent_id) : d.metodo === "usdt_trc20" ? "TRC20 (automático)" : null }} />
                       ) : (
                         <span className="block text-right text-[0.68rem] font-bold text-ink/40">—</span>
                       )}
@@ -100,7 +101,8 @@ export default async function AdminDepositosPage({ searchParams }: { searchParam
         <summary className="flex cursor-pointer list-none items-center gap-2 font-extrabold uppercase tracking-wider text-ink/50"><ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" /> Como funciona a aprovação</summary>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 font-medium leading-relaxed">
           <li>Depósitos USDT confirmados pelo NOWPayments (IPN) são creditados automaticamente; aparece aqui como <em>aprovado</em>.</li>
-          <li>Depósitos M-Pesa/e-Mola só aparecem em <em>Por aprovar</em> depois de o agente confirmar a receção do dinheiro.</li>
+          <li>Depois de o cliente submeter o código, o depósito aparece em <em>À espera do agente</em>; ainda não credita o saldo.</li>
+          <li>Quando o agente confirmar o recebimento, move para <em>Agente confirmou · aprovar</em>. Só a aprovação final da equipa MOZOUT credita a carteira.</li>
           <li>Ao aprovar, o valor líquido é lançado no ledger e o cliente recebe SMS + notificação. Recusar também notifica.</li>
         </ul>
       </details>

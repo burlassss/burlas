@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Não foi possível criar o depósito.";
     const ehKyc = /Limite diário|limite diário/i.test(msg);
-    return NextResponse.json({ erro: msg }, { status: ehKyc ? 403 : 500 });
+    const semAgente = msg.startsWith("SEM_AGENTE:");
+    return NextResponse.json({ erro: msg.replace(/^SEM_AGENTE:\s*/, "") }, { status: ehKyc ? 403 : semAgente ? 503 : 500 });
   }
   const { deposit, agente, cotacao } = resultado;
 
@@ -46,7 +47,9 @@ export async function POST(req: NextRequest) {
       ? {
           id: agente.id,
           nome: agenteUser?.nome ?? "Agente MOZOUT",
-          telefone: agenteUser?.telefone ?? "",
+          telefone: parsed.data.metodo === "mpesa"
+            ? agente.telefone_mpesa ?? (agente.telefone_mpesa === undefined && agente.operadora === "mpesa" ? agenteUser?.telefone ?? "" : "")
+            : agente.telefone_emola ?? (agente.telefone_emola === undefined && agente.operadora === "emola" ? agenteUser?.telefone ?? "" : ""),
           localizacao: agente.localizacao,
           avaliacao_media: agente.avaliacao_media,
           operacoes_concluidas: agente.operacoes_concluidas,

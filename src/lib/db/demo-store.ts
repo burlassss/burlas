@@ -107,8 +107,8 @@ function seed(): DBData {
   ];
 
   const agents: Agent[] = [
-    { id: uuid(), user_id: agenteMpesaUser.id, operadora: "mpesa", limite_diario: 1000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 0, total_operacoes: 0, operacoes_concluidas: 0, tempo_resposta_min: 5, localizacao: null, criado_em: agora() },
-    { id: uuid(), user_id: agenteEmolaUser.id, operadora: "emola", limite_diario: 1000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 0, total_operacoes: 0, operacoes_concluidas: 0, tempo_resposta_min: 5, localizacao: null, criado_em: agora() },
+    { id: uuid(), user_id: agenteMpesaUser.id, operadora: "mpesa", telefone_mpesa: agenteMpesaUser.telefone, telefone_emola: null, limite_diario: 1000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 0, total_operacoes: 0, operacoes_concluidas: 0, tempo_resposta_min: 5, localizacao: null, criado_em: agora() },
+    { id: uuid(), user_id: agenteEmolaUser.id, operadora: "emola", telefone_mpesa: null, telefone_emola: agenteEmolaUser.telefone, limite_diario: 1000, disponivel: true, comissao_pct: 1.0, estado: "ativo", avaliacao_media: 0, total_operacoes: 0, operacoes_concluidas: 0, tempo_resposta_min: 5, localizacao: null, criado_em: agora() },
   ];
 
   const rates: Rate[] = [

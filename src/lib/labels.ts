@@ -16,7 +16,7 @@ export const TIPO_MOVIMENTO: Record<string, string> = {
 export const ESTADO_DEPOSITO: Record<string, { label: string; tone: "amber" | "blue" | "green" | "red" | "zinc" }> = {
   aguardando_pagamento: { label: "Aguardando pagamento", tone: "amber" },
   identificado: { label: "Pagamento identificado", tone: "blue" },
-  aguardando_confirmacoes: { label: "Aguardando confirmações", tone: "blue" },
+  aguardando_confirmacoes: { label: "Agente confirmou · aguarda MOZOUT", tone: "blue" },
   pendente_analise: { label: "Pendente de análise", tone: "amber" },
   aprovado: { label: "Aprovado", tone: "green" },
   recusado: { label: "Recusado", tone: "red" },

@@ -18,7 +18,7 @@ interface DepositoResumo {
   agente_nome?: string | null;
 }
 
-export function DepositoAcoes({ deposito }: { deposito: DepositoResumo }) {
+export function DepositoAcoes({ deposito, podeAprovar = true }: { deposito: DepositoResumo; podeAprovar?: boolean }) {
   const router = useRouter();
   const { toast } = useToast();
   const [busy, setBusy] = React.useState<"aprovar" | "recusar" | null>(null);
@@ -46,9 +46,9 @@ export function DepositoAcoes({ deposito }: { deposito: DepositoResumo }) {
     <>
       <div className="flex items-center justify-end gap-1.5">
         <button onClick={() => setVer(true)} className="rounded-lg bg-sand p-2 text-ink/70 transition-colors hover:bg-mist" aria-label="Ver detalhes"><Eye className="h-4 w-4" /></button>
-        <button onClick={() => decidir("aprovar")} disabled={!!busy} className="rounded-lg bg-lime-soft p-2 text-forest transition-colors hover:bg-lime disabled:opacity-50" aria-label="Aprovar depósito">
+        {podeAprovar && <button onClick={() => decidir("aprovar")} disabled={!!busy} className="rounded-lg bg-lime-soft p-2 text-forest transition-colors hover:bg-lime disabled:opacity-50" aria-label="Aprovar depósito">
           {busy === "aprovar" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-        </button>
+        </button>}
         <button onClick={() => decidir("recusar")} disabled={!!busy} className="rounded-lg bg-red-100 p-2 text-red-700 transition-colors hover:bg-red-200 disabled:opacity-50" aria-label="Recusar depósito">
           {busy === "recusar" ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
         </button>
@@ -65,7 +65,7 @@ export function DepositoAcoes({ deposito }: { deposito: DepositoResumo }) {
         </dl>
         <div className="mt-4 flex gap-2">
           <Button variant="danger" className="flex-1" loading={busy === "recusar"} onClick={() => decidir("recusar")}><XCircle className="h-4 w-4" /> Recusar</Button>
-          <Button className="flex-1" loading={busy === "aprovar"} onClick={() => decidir("aprovar")}><CheckCircle2 className="h-4 w-4" /> Aprovar & creditar</Button>
+          {podeAprovar ? <Button className="flex-1" loading={busy === "aprovar"} onClick={() => decidir("aprovar")}><CheckCircle2 className="h-4 w-4" /> Aprovar & creditar</Button> : <p className="flex-1 self-center text-xs font-bold text-amber-800">À espera do agente confirmar a transferência recebida.</p>}
         </div>
       </Modal>
     </>

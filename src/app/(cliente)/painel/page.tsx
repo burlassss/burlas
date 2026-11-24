@@ -36,16 +36,27 @@ export default async function PainelPage() {
   // Visibilidade de depósitos: a caminho (pendentes) e recém-creditados (48h)
   const { pendentePrincipal, recemAprovado } = resumirDepositos(depositos);
 
-  const card = cards[0] ?? null;
-  const plan = card ? await db.findPlan(card.plan_id) : null;
-  const ultimos4 = card ? safeUltimos4(card.numero) : "0000";
-
   // Gasto do mês corrente (compras) para a barra de limite
   const mesAtual = new Date().toISOString().slice(0, 7);
   const todos = await db.listLedger(user.id, { limit: 500 });
   const gastoMesCents = todos
     .filter((e) => e.tipo === "compra" && e.criado_em.slice(0, 7) === mesAtual)
     .reduce((acc, e) => acc + Math.abs(Math.round(e.valor * 100)), 0);
+  const heroCards = await Promise.all(cards.map(async (item) => {
+    const plan = await db.findPlan(item.plan_id);
+    return {
+      id: item.id,
+      planNome: plan?.nome ?? "Cartão MOZOUT",
+      tipo: plan?.tipo ?? "compras",
+      tier: plan?.tier ?? null,
+      estado: item.estado,
+      validade: item.validade,
+      limiteMensal: item.limite_mensal,
+      gastosMesCents: gastoMesCents,
+      ultimos4: safeUltimos4(item.numero),
+      titular: item.titular,
+    } as const;
+  }));
 
   const kyc = await estadoKyc(user.id);
   const mznEquivalente = (fromCents(saldoCents) * cx.valorEfetivo);
@@ -84,9 +95,9 @@ export default async function PainelPage() {
             </span>
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[0.82rem] font-extrabold leading-snug text-amber-950">Depósito a caminho · ref. {pendentePrincipal.referencia}</p>
+            <p className="text-[0.82rem] font-extrabold leading-snug text-amber-950">{pendentePrincipal.estado === "aguardando_confirmacoes" ? "Agente confirmou · aprovação MOZOUT pendente" : "Transferência submetida · em verificação"} · ref. {pendentePrincipal.referencia}</p>
             <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug text-amber-900/90">
-              {pendentePrincipal.metodo === "usdt_trc20"
+              {pendentePrincipal.estado === "aguardando_confirmacoes" ? "O agente confirmou a receção. A equipa MOZOUT ainda precisa de aprovar antes de creditar o saldo." : pendentePrincipal.metodo === "usdt_trc20"
                 ? <>USDT enviado — {formatMoeda(Math.round(pendentePrincipal.valor_usd * 100), "USD")} aguarda confirmação da rede e aprovação.</>
                 : <>Enviaste MT {(pendentePrincipal.valor_mzn ?? 0).toLocaleString("pt-MZ", { minimumFractionDigits: 2 })}{pendentePrincipal.metodo ? ` via ${METODO_LABEL[pendentePrincipal.metodo]}` : ""} — aguarda o agente e o administrador.</>}
               {" "}O saldo actualiza-se sozinho assim que for aprovado.
@@ -138,18 +149,7 @@ export default async function PainelPage() {
         mznEquivalente={mznEquivalente}
         cotacao={cx.valorEfetivo}
         margemPct={cx.margemPct}
-        cartao={card ? {
-          id: card.id,
-          planNome: plan?.nome ?? "Cartão MOZOUT",
-          tipo: plan?.tipo ?? "compras",
-          tier: plan?.tier ?? null,
-          estado: card.estado,
-          validade: card.validade,
-          limiteMensal: card.limite_mensal,
-          gastosMesCents: gastoMesCents,
-          ultimos4,
-          titular: card.titular,
-        } : null}
+        cartoes={heroCards}
       />
 
       {/* Movimentações + carril lateral */}

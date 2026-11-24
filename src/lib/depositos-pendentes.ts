@@ -1,6 +1,8 @@
 import type { Deposit } from "./db/types";
 
-const ESTADOS_PENDENTES = new Set(["aguardando_pagamento", "identificado", "aguardando_confirmacoes", "pendente_analise"]);
+// Só mostrar no painel quando o cliente já submeteu o código de transferência.
+// Pedidos recém-criados (aguardando_pagamento) ainda não significam que o cliente enviou dinheiro.
+const ESTADOS_PENDENTES = new Set(["aguardando_confirmacoes", "pendente_analise"]);
 
 /** Resumo dos depósitos do cliente para destacar no painel (a caminho / recém-creditados). */
 export function resumirDepositos(depositos: Deposit[]) {
