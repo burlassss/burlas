@@ -125,6 +125,7 @@ export async function criarDepositoMobile(
   const q = qPrev;
   const cx = await cotacao("USD/MZN");
   const agente = await selecionarAgente(metodo);
+  if (!agente) throw new Error(`SEM_AGENTE: Não há agente ${metodo === "mpesa" ? "M-Pesa" : "e-Mola"} disponível neste momento. Tenta mais tarde ou escolhe outro método.`);
   const referencia = novaReferencia(metodo === "mpesa" ? "DEP-M" : "DEP-E");
 
   const deposit = await db.insertDeposit({
@@ -187,12 +188,13 @@ export async function submeterCodigoDeposito(user: User, depositoId: string, cod
 export async function agenteConfirmarDeposito(agente: Agent, depositoId: string, nota?: string): Promise<{ ok: boolean; erro?: string }> {
   const deposit = await db.findDeposit(depositoId);
   if (!deposit || deposit.agent_id !== agente.id) return { ok: false, erro: "Operação não encontrada." };
+  if (deposit.estado === "aguardando_confirmacoes") return { ok: true };
+  if (deposit.estado !== "pendente_analise" || !deposit.codigo_tx) return { ok: false, erro: "O cliente ainda não submeteu o código da transferência." };
   const ordens = await db.listOrders({ agentId: agente.id, tipo: "deposito" });
-  const ordem = ordens.find((o) => o.referencia_id === depositoId && ["pendente", "aceite"].includes(o.estado));
-  if (ordem && ordem.estado === "pendente") {
-    await db.updateOrder(ordem.id, { estado: "aceite", aceite_em: new Date().toISOString() });
-  }
-  await notificar(deposit.user_id, { tipo: "deposito_recebido", titulo: "Agente confirmou", corpo: "O agente confirmou o recebimento. Aguarda a aprovação final da equipa MOZOUT." });
+  const ordem = ordens.find((o) => o.referencia_id === depositoId && o.estado === "aceite");
+  if (!ordem) return { ok: false, erro: "Aceita primeiro a ordem antes de confirmar o recebimento." };
+  await db.updateDeposit(deposit.id, { estado: "aguardando_confirmacoes" });
+  await notificar(deposit.user_id, { tipo: "deposito_recebido", titulo: "Agente confirmou", corpo: "O agente confirmou o recebimento. A equipa MOZOUT fará agora a aprovação final antes do crédito." });
   void nota;
   return { ok: true };
 }
@@ -202,7 +204,9 @@ export async function aprovarDeposito(adminId: string, depositoId: string): Prom
   const deposit = await db.findDeposit(depositoId);
   if (!deposit) return { ok: false, erro: "Depósito não encontrado." };
   if (deposit.estado === "aprovado") return { ok: true };
-  if (!["pendente_analise", "identificado", "aguardando_confirmacoes"].includes(deposit.estado)) {
+  if (deposit.metodo === "mpesa" || deposit.metodo === "emola") {
+    if (deposit.estado !== "aguardando_confirmacoes") return { ok: false, erro: "Aguarda o cliente submeter o código e o agente confirmar o recebimento antes da aprovação final." };
+  } else if (!["identificado", "aguardando_confirmacoes", "pendente_analise"].includes(deposit.estado)) {
     return { ok: false, erro: `Não é possível aprovar um depósito no estado “${deposit.estado}”.` };
   }
 
@@ -282,6 +286,8 @@ export async function criarLevantamento(
   if (!capLev.ok) return { ok: false, erro: capLev.erro };
   const q = await cotarLevantamento(metodo, valorUsdCents);
   const cx = await cotacao("USD/MZN");
+  const agente = metodo === "usdt_trc20" ? null : await selecionarAgente(metodo);
+  if (metodo !== "usdt_trc20" && !agente) return { ok: false, erro: `Não há agente ${metodo === "mpesa" ? "M-Pesa" : "e-Mola"} disponível neste momento. O saldo não foi reservado; tenta mais tarde.` };
   const referencia = novaReferencia(metodo === "usdt_trc20" ? "LEV-T" : metodo === "mpesa" ? "LEV-M" : "LEV-E");
 
   // Reserva: debita já valor + taxa. Se a operação for cancelada, faz-se estorno.
@@ -308,7 +314,6 @@ export async function criarLevantamento(
     /* a reserva é auxiliar — o ledger já garante o não-uso duplo */
   }
 
-  const agente = metodo === "usdt_trc20" ? null : await selecionarAgente(metodo);
   const withdrawal = await db.insertWithdrawal({
     user_id: user.id,
     metodo,

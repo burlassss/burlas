@@ -11,9 +11,15 @@ import type { Agent } from "../db/types";
  */
 export async function selecionarAgente(operadora: "mpesa" | "emola"): Promise<Agent | null> {
   const agentes = await db.listAgents({ estado: "ativo" });
-  const elegiveis = agentes.filter(
-    (a) => a.disponivel && (a.operadora === "ambas" || a.operadora === operadora),
-  );
+  const elegiveis = agentes.filter((a) => {
+    const suportaMetodo = a.operadora === "ambas" || a.operadora === operadora;
+    const telefoneMetodo = operadora === "mpesa" ? a.telefone_mpesa : a.telefone_emola;
+    // Compatibilidade com o esquema antigo: uma conta declarada para apenas
+    // uma operadora usava o telefone verificado do utilizador. Nunca inferir
+    // número para "ambas" — precisa de configurar cada carteira separadamente.
+    const legadoSeguro = telefoneMetodo === undefined && a.operadora === operadora;
+    return a.disponivel && suportaMetodo && (legadoSeguro || Boolean(telefoneMetodo && telefoneMetodo.trim()));
+  });
   if (elegiveis.length === 0) return null;
 
   const desde24h = new Date(Date.now() - 24 * 3600 * 1000).toISOString();

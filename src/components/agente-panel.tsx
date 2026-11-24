@@ -310,7 +310,9 @@ function OrdemCard({
             <Button size="sm" variant="ghost" onClick={onRecusar} loading={busy === `recusar:${ordem.id}`} className="text-red-600 hover:bg-red-50"><X className="h-4 w-4" /> Recusar</Button>
           </>
         ) : isDeposito ? (
-          <Button size="sm" variant="dark" onClick={onConfirmarDeposito} loading={busy === `conf-dep:${dep?.id}`}><CheckCheck className="h-4 w-4" /> Confirmar recebimento</Button>
+          dep?.codigo_tx ? (
+            <Button size="sm" variant="dark" onClick={onConfirmarDeposito} loading={busy === `conf-dep:${dep?.id}`}><CheckCheck className="h-4 w-4" /> Confirmar recebimento</Button>
+          ) : <p className="text-xs font-semibold text-ink/50">À espera de o cliente submeter o código da transferência.</p>
         ) : (
           <div className="flex w-full flex-wrap items-center gap-2">
             <Input

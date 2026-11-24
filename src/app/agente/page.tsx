@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { AgentePanel, type OrdemView, type AgenteStats } from "@/components/agente-panel";
 import { AgenteCandidatura } from "@/components/agente-candidatura";
 import { toCents } from "@/lib/money";
+import { AgenteMetodosForm } from "@/components/agente-metodos-form";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -71,5 +72,5 @@ export default async function AgentePage() {
       }),
   );
 
-  return <AgentePanel stats={stats} pendentes={pendentes} historico={historico} />;
+  return <div className="flex flex-col gap-5"><AgenteMetodosForm operadoraInicial={agente.operadora} mpesaInicial={agente.telefone_mpesa} emolaInicial={agente.telefone_emola} /><AgentePanel stats={stats} pendentes={pendentes} historico={historico} /></div>;
 }

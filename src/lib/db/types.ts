@@ -214,6 +214,9 @@ export interface Agent {
   id: string;
   user_id: string;
   operadora: AgenteOperadora;
+  /** Números de recebimento por método; opcionais para compatibilidade com registos antigos. */
+  telefone_mpesa?: string | null;
+  telefone_emola?: string | null;
   limite_diario: number;
   disponivel: boolean;
   comissao_pct: number;

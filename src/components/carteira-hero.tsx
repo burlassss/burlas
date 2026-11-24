@@ -34,15 +34,17 @@ export function CarteiraHero({
   mznEquivalente,
   cotacao,
   margemPct,
-  cartao,
+  cartoes,
 }: {
   saldoCents: number;
   reservadoCents: number;
   mznEquivalente: number;
   cotacao: number;
   margemPct: number;
-  cartao: HeroCartao | null;
+  cartoes: HeroCartao[];
 }) {
+  const [cartaoId, setCartaoId] = React.useState(cartoes[0]?.id ?? "");
+  const cartao = cartoes.find((c) => c.id === cartaoId) ?? cartoes[0] ?? null;
   const router = useRouter();
   const { toast } = useToast();
   const [visivel, setVisivel] = React.useState(true);
@@ -154,6 +156,25 @@ export function CarteiraHero({
               </Badge>
             )}
           </div>
+
+          {cartoes.length > 1 && (
+            <div className="mt-3" aria-label="Selecionar cartão">
+              <p className="mb-1.5 text-[0.62rem] font-bold uppercase tracking-wider text-cream/55">Os teus cartões · {cartoes.length}</p>
+              <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Cartões da carteira">
+                {cartoes.map((c, index) => (
+                  <button key={c.id} type="button" role="tab" aria-selected={c.id === cartao?.id} onClick={() => {
+                    setCartaoId(c.id);
+                    setRevelado(false);
+                    setDados(null);
+                    setDetalhesAberto(false);
+                  }} className={`shrink-0 rounded-xl border px-3 py-2 text-left transition-colors ${c.id === cartao?.id ? "border-lime bg-lime/15 text-lime" : "border-white/15 bg-white/5 text-cream/75 hover:bg-white/10"}`}>
+                    <span className="block text-[0.68rem] font-extrabold">{c.planNome || `Cartão ${index + 1}`}</span>
+                    <span className="mt-0.5 block font-mono text-[0.62rem]">•••• {c.ultimos4}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-4 flex flex-1 flex-col items-center justify-center">
             {cartao ? (
