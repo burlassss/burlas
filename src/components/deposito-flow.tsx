@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Copy, Check, ShieldAlert, Loader2,
   Smartphone, Bitcoin, Star, MapPin, Timer, Receipt, ExternalLink, BadgeCheck,
-  Search, UserRoundSearch, Hourglass, PartyPopper, Wallet, AlertCircle, RefreshCw, Zap,
+  Search, UserRoundSearch, Hourglass, PartyPopper, Wallet, AlertCircle, RefreshCw,
 } from "lucide-react";
 import { Button, Input, Label, FieldError } from "@/components/ui";
 import { EmolaCheckout, type EmolaCheckoutResultado } from "@/components/emola-checkout";
@@ -292,10 +292,10 @@ export function DepositoFlow({ demo, emolaDirecto = false, telefone = "" }: { de
         id: "emola",
         titulo: "e-Mola",
         descricao: emolaDirecto
-          ? "Depósito automático da tua carteira e-Mola — sem agente — ou com agente verificado."
+          ? "Directo da tua carteira e-Mola — sem agente, creditado na hora."
           : "Encontramos um agente e-Mola verificado, na hora.",
         icon: Smartphone,
-        nota: emolaDirecto ? "Automático, sem agente · 1,5%" : "Comissão incluída · 1,5%",
+        nota: emolaDirecto ? "Sem agente · 1,5%" : "Comissão incluída · 1,5%",
       },
     ];
     return (
@@ -339,7 +339,7 @@ export function DepositoFlow({ demo, emolaDirecto = false, telefone = "" }: { de
             isCrypto
               ? "Indica o valor em dólares (mínimo $10)."
               : metodo === "emola" && emolaDirecto
-                ? "Indica o valor em meticais — depois escolhes pagamento automático (sem agente) ou agente."
+                ? "Indica o valor em meticais — pagas directo da tua carteira e-Mola."
                 : "Indica o valor em meticais — nós encontramos o agente."
           }
           voltar onVoltar={() => setEtapa("metodo")}
@@ -406,14 +406,9 @@ export function DepositoFlow({ demo, emolaDirecto = false, telefone = "" }: { de
 
         <FieldError>{erro}</FieldError>
         {!isCrypto && metodo === "emola" && emolaDirecto ? (
-          <div className="mt-4 flex flex-col gap-2.5">
-            <Button size="lg" className="w-full" disabled={mznNumero < 100 || cotando} onClick={() => { setErro(null); setEmolaResultado(null); setEtapa("emola"); }}>
-              <Zap className="h-5 w-5" /> Depósito automático (sem agente)
-            </Button>
-            <Button size="lg" variant="outline" className="w-full" loading={busy} disabled={mznNumero < 100} onClick={criarDeposito}>
-              <UserRoundSearch className="h-5 w-5" /> Prefiro com agente verificado
-            </Button>
-          </div>
+          <Button size="lg" className="mt-4 w-full" disabled={mznNumero < 100 || cotando} onClick={() => { setErro(null); setEmolaResultado(null); setEtapa("emola"); }}>
+            Continuar <ArrowRight className="h-5 w-5" />
+          </Button>
         ) : (
           <Button size="lg" className="mt-4 w-full" loading={busy} onClick={criarDeposito}>
             {isCrypto ? <>Continuar <ArrowRight className="h-5 w-5" /></> : <><UserRoundSearch className="h-5 w-5" /> Encontrar agente agora</>}
@@ -434,7 +429,7 @@ export function DepositoFlow({ demo, emolaDirecto = false, telefone = "" }: { de
           <h2 className="text-2xl font-extrabold tracking-tight text-forest">Depósito creditado!</h2>
           <p className="max-w-sm text-sm font-medium text-ink/60">
             <strong>{formatMoeda(Math.round((emolaResultado.valorUsdCreditado ?? 0) * 100), "USD")}</strong> creditados na tua
-            carteira — {formatUnits(Math.round(emolaResultado.valorMzn * 100), "MZN")} recebidos via e-Mola
+            carteira — {formatUnits(emolaResultado.valorMzn, "MZN")} recebidos via e-Mola
             (ref. {emolaResultado.transRef}).
           </p>
           <div className="flex w-full max-w-xs flex-col gap-2.5">
@@ -448,14 +443,14 @@ export function DepositoFlow({ demo, emolaDirecto = false, telefone = "" }: { de
       <div>
         <PassoCabecalho
           passo={2}
-          titulo="Depósito automático e-Mola"
+          titulo="Depósito via e-Mola"
           subtitulo="Directo da tua carteira e-Mola — sem agente, creditado na hora."
           voltar onVoltar={() => setEtapa("valor")}
         />
         <div className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
           <EmolaCheckout
             depositoMzn={mznNumero}
-            titulo={`Depósito de ${formatUnits(Math.round(mznNumero * 100), "MZN")}`}
+            titulo={`Depósito de ${formatUnits(mznNumero, "MZN")}`}
             telefoneInicial={telefone}
             onConcluido={(r) => { setEmolaResultado(r); router.refresh(); }}
             onCancelar={() => setEtapa("valor")}
