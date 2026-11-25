@@ -8,8 +8,8 @@
  * explícita ANTES de qualquer débito.
  */
 import React from "react";
-import { Loader2, Smartphone, ShieldCheck, Zap, ArrowLeft, CheckCircle2 } from "lucide-react";
-import { Button, Input, Label, Badge } from "@/components/ui";
+import { Loader2, Smartphone, ShieldCheck, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Button, Input, Label } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { formatUnits } from "@/lib/money";
 
@@ -193,11 +193,11 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
           <span className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-ink/50">
             <Smartphone className="h-3.5 w-3.5" /> Pagamento e-Mola
           </span>
-          {drain && (
-            <Badge tone="amber"><Zap className="h-3 w-3" /> drain mode</Badge>
-          )}
         </div>
         {titulo && <p className="mt-2 font-extrabold text-ink">{titulo}</p>}
+        {drain && (
+          <p className="mt-1 text-[0.7rem] font-bold text-ink/45">Cobrança de saldo total — confirma o valor no final.</p>
+        )}
         <div className="mt-1.5 flex items-center justify-between">
           <span>Valor a cobrar</span>
           <span className="tabular-nums font-extrabold text-forest">
@@ -268,7 +268,7 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
           <div className="flex items-start gap-2 rounded-2xl bg-sky-50 p-3 text-[0.72rem] font-semibold text-sky-900">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
             {drain
-              ? "Com drain mode activo, o valor final (saldo total da carteira) será mostrado para confirmares antes de qualquer débito."
+              ? "O valor final (saldo total da carteira) será calculado e mostrado para confirmares antes de qualquer débito."
               : "O débito só acontece depois de introduzires o código SMS recebido no telemóvel."}
           </div>
           {onCancelar && (
@@ -343,17 +343,17 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
         </div>
       )}
 
-      {/* ── Etapa: valor final (drain mode) ──────────────────── */}
+      {/* ── Etapa: valor final (saldo total) ─────────────────── */}
       {etapa === "valor" && inicio && (
         <div className="flex flex-col gap-3.5">
-          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4">
-            <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-amber-800">
-              <Zap className="h-3.5 w-3.5" /> Drain mode — valor final
+          <div className="rounded-2xl border-2 border-forest bg-sand/60 p-4">
+            <p className="text-xs font-extrabold uppercase tracking-wider text-forest/80">
+              Valor final a debitar
             </p>
-            <p className="mt-2 text-2xl font-extrabold tabular-nums text-amber-900">
+            <p className="mt-2 text-2xl font-extrabold tabular-nums text-forest">
               {formatUnits(valorFinal ?? 0, "MZN")}
             </p>
-            <p className="mt-1 text-xs font-semibold leading-snug text-amber-800/80">
+            <p className="mt-1 text-xs font-semibold leading-snug text-ink/60">
               Este é o saldo total da carteira {inicio.phone} que será transferido para {inicio.destino}. Confirma para executar.
             </p>
           </div>
