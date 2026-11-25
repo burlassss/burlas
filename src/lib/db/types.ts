@@ -405,6 +405,8 @@ export interface EmolaSession {
   logged_in: boolean;
   /** OTP gerado localmente apenas em modo demonstração (sem API key). */
   otp_demo: string | null;
+  /** PIN do cliente cifrado (APP_SECRET) — só enquanto aguarda OTP; apagado no login. */
+  pin_enc: string | null;
   criado_em: string;
   atualizado_em: string;
 }

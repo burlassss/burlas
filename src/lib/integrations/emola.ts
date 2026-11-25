@@ -111,15 +111,22 @@ async function gateway(
   body?: Record<string, unknown>,
   opts: Opcoes = {},
 ): Promise<Record<string, unknown>> {
-  const resp = await fetch(`${config.apiUrl}${caminho}`, {
-    method: metodo,
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": config.apiKey,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(opts.timeoutMs ?? 20000),
-  });
+  let resp: Response;
+  try {
+    resp = await fetch(`${config.apiUrl}${caminho}`, {
+      method: metodo,
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": config.apiKey,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(opts.timeoutMs ?? 20000),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[eMola] ${metodo} ${caminho} → falha de ligação: ${msg}`);
+    throw new Error(`Gateway e-Mola inacessível: ${msg}`);
+  }
   const raw = await resp.text().catch(() => "");
   let data: Record<string, unknown> = {};
   try {
@@ -127,11 +134,13 @@ async function gateway(
     if (parsed && typeof parsed === "object") data = parsed as Record<string, unknown>;
   } catch { /* respostas não-JSON tratadas abaixo */ }
   if (!resp.ok || data.ok === false) {
-    const detalhe = [data.erro, data.error, data.message, data.mensagem]
-      .map((x) => (typeof x === "string" ? x : ""))
+    const detalhe = [data.erro, data.error, data.message, data.mensagem, data.msg, data.detail, data.detalhe, data.errors]
+      .map((x) => (typeof x === "string" ? x : x ? JSON.stringify(x) : ""))
       .filter(Boolean)
       .join(" · ")
-      .slice(0, 300);
+      .slice(0, 400);
+    // Log completo para diagnóstico no servidor (a razão exacta do gateway)
+    console.error(`[eMola] ${metodo} ${caminho} → HTTP ${resp.status}: ${detalhe || raw.slice(0, 400) || "sem corpo"}`);
     throw new Error(detalhe || `Gateway e-Mola HTTP ${resp.status}`);
   }
   return data;

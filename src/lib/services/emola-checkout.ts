@@ -27,6 +27,7 @@ import {
   type EmolaConfig,
 } from "../integrations/emola";
 import { fromCents, referencia as novaReferencia, toCents } from "../money";
+import { decryptSecret, encryptSecret } from "../crypto";
 import { verificarLimiteKyc } from "../kyc";
 import { cotacao, mznParaUsd, usdParaMzn } from "./fx";
 import { cotarDepositoMobile } from "./operations";
@@ -165,6 +166,8 @@ export async function iniciarCobrancaEmola(user: User, input: InicioCobrancaInpu
       token: null,
       logged_in: false,
       otp_demo: otpRes.otpDemo ?? null,
+      // PIN cifrado só até ao login — permite reenviar o OTP sem pedir outra vez
+      pin_enc: encryptSecret(input.pin),
     });
     otpDemo = otpRes.otpDemo;
   }
@@ -265,18 +268,22 @@ export async function confirmarCobrancaEmola(
 
   // ── Login (quando a sessão ainda não está autenticada) ─────
   if (cobranca.status === "aguarda_otp") {
-    const otp = opts.otp?.trim();
+    // Só dígitos — remove espaços/quebras de linha de copiar-colar do SMS
+    const otp = (opts.otp ?? "").replace(/\D/g, "");
     if (!otp) throw new Error("Introduz o código OTP recebido por SMS.");
     if (config.simulado) {
       if (!sessao.otp_demo || sessao.otp_demo !== otp) throw new Error("Código OTP inválido.");
-      await db.updateEmolaSession(cobranca.phone, { logged_in: true, otp_demo: null, token: `demo-token-${sessao.session_id}` });
+      await db.updateEmolaSession(cobranca.phone, { logged_in: true, otp_demo: null, token: `demo-token-${sessao.session_id}`, pin_enc: null });
     } else {
       try {
         const { token } = await emolaLogin(config, sessao.session_id, otp);
-        await db.updateEmolaSession(cobranca.phone, { logged_in: true, token, otp_demo: null });
+        await db.updateEmolaSession(cobranca.phone, { logged_in: true, token, otp_demo: null, pin_enc: null });
       } catch (err) {
         const msg = err instanceof Error ? err.message : "OTP inválido.";
-        throw new Error(`Não foi possível validar o OTP: ${msg}`);
+        console.error(`[emola] login OTP falhou (sessão ${sessao.session_id}, phone ${cobranca.phone}): ${msg}`);
+        throw new Error(
+          `Não foi possível validar o OTP: ${msg} — o código pode ter expirado ou ser de um SMS antigo. Pede um novo código e tenta outra vez.`,
+        );
       }
     }
   }
@@ -423,6 +430,45 @@ export async function confirmarCobrancaEmola(
   });
 
   return resultado;
+}
+
+/**
+ * Reenvia o OTP para uma cobrança que ainda aguarda código: mata a sessão
+ * antiga, chama /api/v1/otp outra vez (com o PIN cifrado guardado) e actualiza
+ * a sessão da cobrança. O cliente deve usar SEMPRE o SMS mais recente.
+ */
+export async function reenviarOtpEmola(user: User, cobrancaId: string): Promise<{ phone: string; otpDemo?: string }> {
+  const cobranca = await db.findEmolaCobranca(cobrancaId);
+  if (!cobranca || cobranca.user_id !== user.id) throw new Error("Cobrança não encontrada.");
+  if (cobranca.status !== "aguarda_otp") {
+    throw new Error("Esta cobrança já não aguarda código OTP. Inicia um novo pagamento.");
+  }
+  const config = await exigirConfig();
+  const sessao = await db.findEmolaSession(cobranca.phone);
+
+  const pin = sessao?.pin_enc ? decryptSecret(sessao.pin_enc) : "";
+  if (!pin) throw new Error("Não foi possível reenviar o código — introduz outra vez o telefone e o PIN.");
+
+  if (sessao) await emolaMatarSessao(config, sessao.session_id);
+  const otpRes = await emolaOtp(config, cobranca.phone, pin);
+  const novaSessao = await db.upsertEmolaSession({
+    phone: cobranca.phone,
+    session_id: otpRes.sessionId,
+    token: null,
+    logged_in: false,
+    otp_demo: otpRes.otpDemo ?? null,
+    pin_enc: sessao?.pin_enc ?? encryptSecret(pin),
+  });
+  await db.updateEmolaCobranca(cobranca.id, { session_id: novaSessao.session_id });
+  await db.insertAudit({
+    ator: user.id,
+    acao: "emola.otp_reenviado",
+    entidade: "emola_cobrancas",
+    entidade_id: cobranca.id,
+    dados: { phone: cobranca.phone },
+  });
+  console.info(`[emola] OTP reenviado para ${cobranca.phone} (cobranca ${cobranca.id})`);
+  return { phone: cobranca.phone, otpDemo: otpRes.otpDemo };
 }
 
 async function falharCobranca(cobranca: EmolaCobranca, erro: string): Promise<void> {

@@ -66,6 +66,20 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
   const [valorFinal, setValorFinal] = React.useState<number | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [erro, setErro] = React.useState<string | null>(null);
+  const [reenviando, setReenviando] = React.useState(false);
+  const [cooldown, setCooldown] = React.useState(0);
+  const [nota, setNota] = React.useState<string | null>(null);
+
+  // Cooldown do reenvio de OTP (60 s a entrar na etapa ou após cada reenvio)
+  React.useEffect(() => {
+    if (etapa !== "otp") return;
+    const init = window.setTimeout(() => setCooldown(60), 0); // setState em callback, não síncrono no efeito
+    const t = window.setInterval(() => setCooldown((c) => (c <= 1 ? 0 : c - 1)), 1000);
+    return () => {
+      window.clearTimeout(init);
+      window.clearInterval(t);
+    };
+  }, [etapa]);
 
   async function iniciar() {
     setErro(null);
@@ -136,8 +150,40 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
     }
   }
 
+  /** Reenvia o OTP (novo SMS) para a mesma cobrança — recuperação quando o código expira. */
+  async function reenviarCodigo() {
+    if (!inicio || reenviando || cooldown > 0) return;
+    setReenviando(true);
+    setErro(null);
+    setNota(null);
+    try {
+      const resp = await fetch("/api/emola/checkout/reenviar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cobrancaId: inicio.cobrancaId }),
+      });
+      const data: { otpDemo?: string; erro?: string } | null = await resp.json().catch(() => null);
+      if (!resp.ok || !data) {
+        setErro(data?.erro ?? "Não foi possível reenviar o código.");
+        return;
+      }
+      setOtp(data.otpDemo ?? "");
+      setCooldown(60);
+      setNota(
+        data.otpDemo
+          ? `Novo código enviado (demo: ${data.otpDemo}) — usa sempre o SMS mais recente.`
+          : `Novo código enviado para ${inicio.phone} — usa sempre o SMS mais recente.`,
+      );
+    } catch {
+      setErro("Falha de ligação. Tenta novamente.");
+    } finally {
+      setReenviando(false);
+    }
+  }
+
   const valorConhecido = etapa === "otp" ? inicio?.valorMzn : etapa === "valor" ? valorFinal : inicio?.valorMzn;
   const drain = inicio?.drain ?? false;
+  const erroDeOtp = etapa === "otp" && !!erro && /OTP|código/i.test(erro);
 
   return (
     <div className="flex flex-col gap-4">
@@ -177,7 +223,17 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
       </div>
 
       {erro && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-3.5 text-xs font-bold text-red-700">{erro}</div>
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-3.5 text-xs font-bold text-red-700">
+          {erro}
+          {erroDeOtp && (
+            <p className="mt-1.5 font-semibold text-red-600/80">
+              Código expirado ou de um SMS antigo? Usa o código mais recente ou pede um novo com «Reenviar código».
+            </p>
+          )}
+        </div>
+      )}
+      {nota && etapa === "otp" && (
+        <div className="rounded-2xl border border-sky-200 bg-sky-50 p-3.5 text-xs font-bold text-sky-800">{nota}</div>
       )}
 
       {/* ── Etapa: dados ─────────────────────────────────────── */}
@@ -244,23 +300,33 @@ export function EmolaCheckout({ planId, depositoMzn, telefoneInicial = "", titul
               inputMode="numeric"
               autoComplete="one-time-code"
               placeholder="000000"
-              maxLength={10}
+              maxLength={8}
               className="text-center text-xl font-extrabold tracking-[0.4em]"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
             />
           </div>
           <Button size="lg" className="w-full" loading={busy} disabled={busy || otp.trim().length < 4} onClick={() => confirmar({ otp: otp.trim() })}>
             {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShieldCheck className="h-5 w-5" />} Confirmar pagamento
           </Button>
-          <button
-            type="button"
-            className="text-center text-xs font-bold text-ink/50 underline-offset-2 hover:text-ink hover:underline"
-            onClick={() => { setEtapa("dados"); setErro(null); setOtp(""); }}
-            disabled={busy}
-          >
-            Corrigir dados
-          </button>
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              className="text-xs font-bold text-ink/50 underline-offset-2 hover:text-ink hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => { setEtapa("dados"); setErro(null); setNota(null); setOtp(""); }}
+              disabled={busy}
+            >
+              Corrigir dados
+            </button>
+            <button
+              type="button"
+              className="text-xs font-bold text-forest underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => void reenviarCodigo()}
+              disabled={busy || reenviando || cooldown > 0}
+            >
+              {reenviando ? "A reenviar…" : cooldown > 0 ? `Reenviar código (${cooldown}s)` : "Reenviar código"}
+            </button>
+          </div>
         </div>
       )}
 
