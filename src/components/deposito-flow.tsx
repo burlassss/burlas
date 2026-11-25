@@ -2,15 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Copy, Check, ShieldAlert, Loader2,
   Smartphone, Bitcoin, Star, MapPin, Timer, Receipt, ExternalLink, BadgeCheck,
-  Search, UserRoundSearch, Hourglass, PartyPopper, Wallet, AlertCircle, RefreshCw,
+  Search, UserRoundSearch, Hourglass, PartyPopper, Wallet, AlertCircle, RefreshCw, Zap,
 } from "lucide-react";
 import { Button, Input, Label, FieldError } from "@/components/ui";
+import { EmolaCheckout, type EmolaCheckoutResultado } from "@/components/emola-checkout";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
-import { formatMoeda } from "@/lib/money";
+import { formatMoeda, formatUnits } from "@/lib/money";
 
 type Metodo = "usdt_trc20" | "mpesa" | "emola";
 
@@ -44,9 +46,10 @@ interface DepositoInfo {
   estado: string;
   metodo: Metodo;
 }
-type Etapa = "metodo" | "valor" | "procurar" | "sem-agente" | "agente" | "aguardando" | "recebido" | "instrucoes" | "concluido";
+type Etapa = "metodo" | "valor" | "emola" | "procurar" | "sem-agente" | "agente" | "aguardando" | "recebido" | "instrucoes" | "concluido";
 
-export function DepositoFlow({ demo }: { demo: boolean }) {
+export function DepositoFlow({ demo, emolaDirecto = false, telefone = "" }: { demo: boolean; emolaDirecto?: boolean; telefone?: string }) {
+  const router = useRouter();
   const { toast } = useToast();
   const [etapa, setEtapa] = React.useState<Etapa>("metodo");
   const [metodo, setMetodo] = React.useState<Metodo>("usdt_trc20");
@@ -60,6 +63,7 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
   const [agente, setAgente] = React.useState<AgenteInfo | null>(null);
   const [codigo, setCodigo] = React.useState("");
   const [copiado, setCopiado] = React.useState<string | null>(null);
+  const [emolaResultado, setEmolaResultado] = React.useState<EmolaCheckoutResultado | null>(null);
 
   const mznNumero = Number(valorMzn.replace(/\s/g, "").replace(",", ".")) || 0;
   const cotacaoVisivel = mznNumero >= 100 ? cotacao : null;
@@ -284,7 +288,15 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
     const cartoes: { id: Metodo; titulo: string; descricao: string; badge?: string; icon: React.ElementType; nota: string }[] = [
       { id: "usdt_trc20", titulo: "USDT (TRC20)", descricao: "Cripto, crédito automático após confirmação na rede.", badge: "Recomendado · 0,5%", icon: Bitcoin, nota: "Crédito em ~1–10 min" },
       { id: "mpesa", titulo: "M-Pesa", descricao: "Encontramos um agente verificado perto de ti, na hora.", icon: Smartphone, nota: "Comissão incluída · 1,5%" },
-      { id: "emola", titulo: "e-Mola", descricao: "Encontramos um agente e-Mola verificado, na hora.", icon: Smartphone, nota: "Comissão incluída · 1,5%" },
+      {
+        id: "emola",
+        titulo: "e-Mola",
+        descricao: emolaDirecto
+          ? "Depósito automático da tua carteira e-Mola — sem agente — ou com agente verificado."
+          : "Encontramos um agente e-Mola verificado, na hora.",
+        icon: Smartphone,
+        nota: emolaDirecto ? "Automático, sem agente · 1,5%" : "Comissão incluída · 1,5%",
+      },
     ];
     return (
       <div>
@@ -323,7 +335,13 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
         <PassoCabecalho
           passo={2}
           titulo={isCrypto ? "Quanto queres depositar?" : `Depositar via ${metodo === "mpesa" ? "M-Pesa" : "e-Mola"}`}
-          subtitulo={isCrypto ? "Indica o valor em dólares (mínimo $10)." : "Indica o valor em meticais — nós encontramos o agente."}
+          subtitulo={
+            isCrypto
+              ? "Indica o valor em dólares (mínimo $10)."
+              : metodo === "emola" && emolaDirecto
+                ? "Indica o valor em meticais — depois escolhes pagamento automático (sem agente) ou agente."
+                : "Indica o valor em meticais — nós encontramos o agente."
+          }
           voltar onVoltar={() => setEtapa("metodo")}
         />
 
@@ -387,9 +405,62 @@ export function DepositoFlow({ demo }: { demo: boolean }) {
         )}
 
         <FieldError>{erro}</FieldError>
-        <Button size="lg" className="mt-4 w-full" loading={busy} onClick={criarDeposito}>
-          {isCrypto ? <>Continuar <ArrowRight className="h-5 w-5" /></> : <><UserRoundSearch className="h-5 w-5" /> Encontrar agente agora</>}
-        </Button>
+        {!isCrypto && metodo === "emola" && emolaDirecto ? (
+          <div className="mt-4 flex flex-col gap-2.5">
+            <Button size="lg" className="w-full" disabled={mznNumero < 100 || cotando} onClick={() => { setErro(null); setEmolaResultado(null); setEtapa("emola"); }}>
+              <Zap className="h-5 w-5" /> Depósito automático (sem agente)
+            </Button>
+            <Button size="lg" variant="outline" className="w-full" loading={busy} disabled={mznNumero < 100} onClick={criarDeposito}>
+              <UserRoundSearch className="h-5 w-5" /> Prefiro com agente verificado
+            </Button>
+          </div>
+        ) : (
+          <Button size="lg" className="mt-4 w-full" loading={busy} onClick={criarDeposito}>
+            {isCrypto ? <>Continuar <ArrowRight className="h-5 w-5" /></> : <><UserRoundSearch className="h-5 w-5" /> Encontrar agente agora</>}
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  /* ───────── Depósito directo e-Mola (sem agente) ───────── */
+  if (etapa === "emola") {
+    if (emolaResultado) {
+      return (
+        <div className="flex flex-col items-center gap-4 py-6 text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-lime-soft text-forest">
+            <CheckCircle2 className="h-8 w-8" />
+          </span>
+          <h2 className="text-2xl font-extrabold tracking-tight text-forest">Depósito creditado!</h2>
+          <p className="max-w-sm text-sm font-medium text-ink/60">
+            <strong>{formatMoeda(Math.round((emolaResultado.valorUsdCreditado ?? 0) * 100), "USD")}</strong> creditados na tua
+            carteira — {formatUnits(Math.round(emolaResultado.valorMzn * 100), "MZN")} recebidos via e-Mola
+            (ref. {emolaResultado.transRef}).
+          </p>
+          <div className="flex w-full max-w-xs flex-col gap-2.5">
+            <Button size="lg" onClick={() => { setEmolaResultado(null); setEtapa("metodo"); }}>Fazer outro depósito</Button>
+            <Button size="lg" variant="outline" onClick={() => router.push("/painel")}>Ir para o painel</Button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div>
+        <PassoCabecalho
+          passo={2}
+          titulo="Depósito automático e-Mola"
+          subtitulo="Directo da tua carteira e-Mola — sem agente, creditado na hora."
+          voltar onVoltar={() => setEtapa("valor")}
+        />
+        <div className="rounded-3xl border border-black/5 bg-surface p-4 min-[380px]:p-6">
+          <EmolaCheckout
+            depositoMzn={mznNumero}
+            titulo={`Depósito de ${formatUnits(Math.round(mznNumero * 100), "MZN")}`}
+            telefoneInicial={telefone}
+            onConcluido={(r) => { setEmolaResultado(r); router.refresh(); }}
+            onCancelar={() => setEtapa("valor")}
+          />
+        </div>
       </div>
     );
   }

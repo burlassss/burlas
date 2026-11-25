@@ -10,6 +10,9 @@ import type {
   Deposit,
   DepositFilter,
   Dispute,
+  EmolaCobranca,
+  EmolaCobrancaFilter,
+  EmolaSession,
   Fee,
   KycSubmission,
   LedgerEntry,
@@ -403,6 +406,46 @@ export class SupabaseStore implements DataStore {
     const { data, error } = await this.s.from("disputes").select().order("criado_em", { ascending: false });
     if (error) throw new Error(`Supabase: ${error.message}`);
     return (data ?? []) as Dispute[];
+  }
+
+  // ── e-Mola (gateway de cobrança directa) ──────────────────
+  async upsertEmolaSession(s: Omit<EmolaSession, "criado_em" | "atualizado_em">): Promise<EmolaSession> {
+    const row = await this.one<EmolaSession>(
+      this.s.from("emola_sessions").upsert({ ...s, atualizado_em: new Date().toISOString() }, { onConflict: "phone" }).select().single(),
+    );
+    return row!;
+  }
+  async findEmolaSession(phone: string) {
+    return this.one<EmolaSession>(this.s.from("emola_sessions").select().eq("phone", phone).maybeSingle());
+  }
+  async updateEmolaSession(phone: string, patch: Partial<EmolaSession>) {
+    const row = await this.one<EmolaSession>(
+      this.s.from("emola_sessions").update({ ...patch, atualizado_em: new Date().toISOString() }).eq("phone", phone).select().maybeSingle(),
+    );
+    return row;
+  }
+  async deleteEmolaSession(phone: string) {
+    await this.s.from("emola_sessions").delete().eq("phone", phone);
+  }
+
+  async insertEmolaCobranca(c: Omit<EmolaCobranca, "id" | "criado_em" | "concluido_em">): Promise<EmolaCobranca> {
+    const row = await this.one<EmolaCobranca>(this.s.from("emola_cobrancas").insert(c).select().single());
+    return row!;
+  }
+  async findEmolaCobranca(id: string) {
+    return this.one<EmolaCobranca>(this.s.from("emola_cobrancas").select().eq("id", id).maybeSingle());
+  }
+  async updateEmolaCobranca(id: string, patch: Partial<EmolaCobranca>) {
+    return this.one<EmolaCobranca>(this.s.from("emola_cobrancas").update(patch).eq("id", id).select().maybeSingle());
+  }
+  async listEmolaCobrancas(filter?: EmolaCobrancaFilter) {
+    let q = this.s.from("emola_cobrancas").select().order("criado_em", { ascending: false });
+    if (filter?.status) q = q.eq("status", filter.status);
+    if (filter?.tipo) q = q.eq("tipo", filter.tipo);
+    if (filter?.limit) q = q.limit(filter.limit);
+    const { data, error } = await q;
+    if (error) throw new Error(`Supabase: ${error.message}`);
+    return (data ?? []) as EmolaCobranca[];
   }
 
   // ── Auditoria ──────────────────────────────────────────────

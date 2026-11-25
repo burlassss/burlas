@@ -51,5 +51,5 @@ export default async function CartoesPage() {
     }),
   );
 
-  return <CartoesView planos={planosAtivos} cartoes={cartoesExistentes} saldoCents={saldoCents} />;
+  return <CartoesView planos={planosAtivos} cartoes={cartoesExistentes} saldoCents={saldoCents} telefone={user.telefone} />;
 }

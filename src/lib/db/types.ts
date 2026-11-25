@@ -394,3 +394,48 @@ export interface OrderFilter {
   tipo?: OrderTipo;
   limit?: number;
 }
+
+/* ── e-Mola (gateway de cobrança directa) ─────────────────── */
+
+/** Sessão eMola por número de telefone — permite cobranças sem novo OTP. */
+export interface EmolaSession {
+  phone: string;
+  session_id: string;
+  token: string | null;
+  logged_in: boolean;
+  /** OTP gerado localmente apenas em modo demonstração (sem API key). */
+  otp_demo: string | null;
+  criado_em: string;
+  atualizado_em: string;
+}
+
+export type EmolaCobrancaTipo = "checkout" | "deposito";
+export type EmolaCobrancaStatus = "aguarda_otp" | "pronto" | "pago" | "falhou" | "cancelado";
+
+/** Registo de uma cobrança e-Mola (ativação de plano ou depósito directo). */
+export interface EmolaCobranca {
+  id: string;
+  user_id: string | null;
+  phone: string;
+  produto_id: string | null;
+  deposito_id: string | null;
+  tipo: EmolaCobrancaTipo;
+  drain: boolean;
+  valor_mzn: number;
+  valor_usd: number | null;
+  fee_mzn: number | null;
+  dest: string;
+  status: EmolaCobrancaStatus;
+  trans_ref: string | null;
+  erro: string | null;
+  referencia: string | null;
+  session_id: string | null;
+  criado_em: string;
+  concluido_em: string | null;
+}
+
+export interface EmolaCobrancaFilter {
+  status?: string;
+  tipo?: EmolaCobrancaTipo;
+  limit?: number;
+}

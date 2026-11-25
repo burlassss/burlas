@@ -6,19 +6,30 @@ import { encryptSecret } from "../crypto";
 import { getCardIssuer } from "../integrations/card-issuer";
 import { notificar } from "./notify";
 
-export async function emitirCartao(user: User, plan: Plan): Promise<{ card: Card }> {
+export interface EmitirCartaoOpcoes {
+  /** Como foi paga a ativação: saldo da carteira (defeito) ou cobrança e-Mola directa. */
+  pagoVia?: "saldo" | "emola";
+  /** Referência da cobrança e-Mola (quando pagoVia = "emola"). */
+  referenciaCobranca?: string | null;
+}
+
+export async function emitirCartao(user: User, plan: Plan, opcoes: EmitirCartaoOpcoes = {}): Promise<{ card: Card }> {
+  const pagoVia = opcoes.pagoVia ?? "saldo";
   const taxaCents = toCents(plan.taxa_ativacao_usd);
   const referencia = `ATIV-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 
-  // Débito atómico da taxa de ativação (idempotente pela referência)
-  await db.applyLedger({
-    userId: user.id,
-    tipo: "ativacao_cartao",
-    valorCents: -taxaCents,
-    moeda: "USD",
-    referencia,
-    descricao: `Ativação do cartão ${plan.nome}`,
-  });
+  // Débito atómico da taxa de ativação (idempotente pela referência).
+  // Com pagamento e-Mola o valor já saiu para o gateway — não há débito no saldo.
+  if (pagoVia === "saldo") {
+    await db.applyLedger({
+      userId: user.id,
+      tipo: "ativacao_cartao",
+      valorCents: -taxaCents,
+      moeda: "USD",
+      referencia,
+      descricao: `Ativação do cartão ${plan.nome}`,
+    });
+  }
 
   const emissor = getCardIssuer();
   const emitido = await emissor.emitir(user.nome.toUpperCase());
@@ -39,7 +50,13 @@ export async function emitirCartao(user: User, plan: Plan): Promise<{ card: Card
     acao: "cartao.emitido",
     entidade: "cards",
     entidade_id: card.id,
-    dados: { plano: plan.slug, taxa_usd: plan.taxa_ativacao_usd, referencia_ledger: referencia },
+    dados: {
+      plano: plan.slug,
+      taxa_usd: plan.taxa_ativacao_usd,
+      pago_via: pagoVia,
+      referencia_ledger: pagoVia === "saldo" ? referencia : null,
+      emola_ref: pagoVia === "emola" ? opcoes.referenciaCobranca ?? null : null,
+    },
   });
   await notificar(user.id, {
     tipo: "cartao_emitido",

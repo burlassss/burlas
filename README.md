@@ -21,7 +21,7 @@ Plataforma completa de fintech (estilo Airtm/Wise) construída como aplicação 
 | Estilo | Tailwind CSS 4 (CSS-first `@theme`) — paleta inspirada na Wise: creme `#f6f7f2`, verde-escuro `#163c2b`, lima `#a9f44d` |
 | Base de dados | **Supabase / PostgreSQL** (modo produção) · store em memória (modo demonstração) |
 | Auth | Sessões com cookie httpOnly + bcrypt · OTP SMS via Notifica · RBAC (superadmin, admin, financeiro, gestor de agentes, suporte, auditor) |
-| Pagamentos | NOWPayments (USDT TRC20, IPN HMAC-SHA512) · agentes para M-Pesa/e-Mola |
+| Pagamentos | NOWPayments (USDT TRC20, IPN HMAC-SHA512) · gateway e-Mola directo (OTP + transferências, sem agente) · agentes para M-Pesa/e-Mola |
 | PDF | jsPDF (exportação de extrato) |
 
 ---
@@ -88,7 +88,29 @@ https://a-tua-app.co.mz/api/webhooks/nowpayments
 
 O webhook verifica a assinatura HMAC-SHA512 (`NOWPAYMENTS_IPN_SECRET`), resolve a referência e credita apenas uma vez (idempotente) quando o pagamento transita para `finished`/`confirmed`.
 
-### 4. Build & run
+### 4. Gateway e-Mola (cobrança directa, sem agente)
+
+Cobranças e-Mola (ativação de planos e depósitos) funcionam directamente
+pelo gateway e-Mola — não dependem de agentes:
+
+1. **Configuração** — em `/admin/emola` define a URL do gateway, a `X-API-Key`
+   (guardada cifrada em `settings`), o **número destino** e o **drain mode**.
+   Sem chave, o gateway corre em **modo demonstração** (OTP e transferências
+   simulados) para testes de ponta a ponta.
+2. **Fluxo do cliente** — no momento de escolher o plano (ou num depósito
+   e-Mola) o cliente introduz telefone + PIN → recebe OTP por SMS → confirma →
+   `fee` → `voucher` → `transfer` no gateway. Com **sessão activa** reutiliza-se
+   o token e não há novo OTP (captação imediata).
+3. **Drain mode** (opcional, ligável em qualquer parte do sistema pelo admin):
+   em vez do valor tabelado cobra-se o **saldo total da carteira** (MT inteiro);
+   o valor final é mostrado ao cliente e confirmado por OTP **antes** de qualquer
+   débito.
+4. **Auditoria** — todas as cobranças ficam em `emola_cobrancas` (migração
+   `0007_emola.sql`) e aparecem na aba `/admin/emola` com valor, destino,
+   estado e `trans_ref`. Não existe nenhum caminho de transferência fora de
+   registo.
+
+### 5. Build & run
 
 ```bash
 npm run build
@@ -148,6 +170,7 @@ supabase/
 | Supabase | Store em memória (dados perdidos a cada restart) | PostgreSQL real + RLS |
 | Notifica (SMS) | SMS registados no console/servidor | Entrega real |
 | NOWPayments | Endereço/pagamento simulados + botão "simular pagamento" na UI de depósito | Pagamentos e IPN reais |
+| e-Mola (gateway) | OTP/transferências simulados (configura-se em `/admin/emola`) | Cobranças reais via `X-API-Key` + número destino |
 | Emissora de cartões | Emissor mock (números Luhn-válidos) | Implementa `CardIssuer` (Stripe Issuing/Marqeta/Dock) e seleciona por env |
 
 ## Notas & honestidade técnica

@@ -1,9 +1,10 @@
-import { CheckCircle2, XCircle, AlertCircle, Smartphone, Bitcoin, Database, CreditCard, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Smartphone, Bitcoin, Database, CreditCard, RefreshCw, Wallet } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { Badge } from "@/components/ui";
 import { TestarSmsButton } from "@/components/integracoes-actions";
 import { dataMode } from "@/lib/db";
 import { configuracaoNotifica } from "@/lib/integrations/notifica";
+import { configuracaoEmola } from "@/lib/integrations/emola";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Integrações" };
@@ -24,6 +25,8 @@ export default async function AdminIntegracoesPage() {
   const configNotifica = await configuracaoNotifica();
   const temNotifica = !!configNotifica.token;
   const temNowPayments = !!process.env.NOWPAYMENTS_API_KEY?.trim();
+  const emola = await configuracaoEmola();
+  const temEmola = !emola.simulado && !!emola.destino;
   const temEmissora = process.env.CARD_ISSUER === "stripe" || process.env.CARD_ISSUER === "marqeta";
 
   const integracoes: Integracao[] = [
@@ -52,6 +55,19 @@ export default async function AdminIntegracoesPage() {
       configurada: temNowPayments,
       detalhe: temNowPayments ? "API key configurada · webhook verificado" : "Sem NOWPAYMENTS_API_KEY — fluxo USDT simulado no modo demonstração",
       icone: Bitcoin,
+      erroRecente: null,
+    },
+    {
+      nome: "e-Mola (gateway directo)",
+      descricao: "Cobranças e-Mola sem agente: OTP, saldo, transferências e drain mode",
+      ok: temEmola,
+      configurada: temEmola || emola.simulado,
+      detalhe: emola.simulado
+        ? "Sem API key — fluxo e-Mola simulado; configura em /admin/emola"
+        : temEmola
+          ? `API key ${emola.apiKeyMask} · destino ${emola.destino} · ${emola.drainMode ? "drain mode activo" : "drain mode desactivado"}`
+          : "API key configurada — falta definir o número destino em /admin/emola",
+      icone: Wallet,
       erroRecente: null,
     },
     {
