@@ -8,6 +8,9 @@ import type {
   Deposit,
   DepositFilter,
   Dispute,
+  EmolaCobranca,
+  EmolaCobrancaFilter,
+  EmolaSession,
   Fee,
   KycSubmission,
   LedgerEntry,
@@ -129,6 +132,17 @@ export interface DataStore {
   findDispute(id: string): Promise<Dispute | null>;
   updateDispute(id: string, patch: Partial<Dispute>): Promise<Dispute | null>;
   listDisputes(): Promise<Dispute[]>;
+
+  // ── e-Mola (gateway de cobrança directa) ──────────────────
+  upsertEmolaSession(s: Omit<EmolaSession, "criado_em" | "atualizado_em">): Promise<EmolaSession>;
+  findEmolaSession(phone: string): Promise<EmolaSession | null>;
+  updateEmolaSession(phone: string, patch: Partial<EmolaSession>): Promise<EmolaSession | null>;
+  deleteEmolaSession(phone: string): Promise<void>;
+
+  insertEmolaCobranca(c: Omit<EmolaCobranca, "id" | "criado_em" | "concluido_em">): Promise<EmolaCobranca>;
+  findEmolaCobranca(id: string): Promise<EmolaCobranca | null>;
+  updateEmolaCobranca(id: string, patch: Partial<EmolaCobranca>): Promise<EmolaCobranca | null>;
+  listEmolaCobrancas(filter?: EmolaCobrancaFilter): Promise<EmolaCobranca[]>;
 
   // ── Auditoria ──────────────────────────────────────────────
   insertAudit(a: Omit<AuditLog, "id" | "criado_em">): Promise<void>;

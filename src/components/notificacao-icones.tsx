@@ -19,6 +19,7 @@ export const MOVIMENTO_ICONES: Record<string, React.ElementType> = {
   ordem_atribuida: BellRing,
   disputa_aberta: ShieldAlert,
   disputa_resolvida: ShieldCheck,
+  pagamento_emola: CircleDollarSign,
   seguranca: ShieldAlert,
   default: Bell,
 };

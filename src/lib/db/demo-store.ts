@@ -11,6 +11,9 @@ import type {
   Deposit,
   DepositFilter,
   Dispute,
+  EmolaCobranca,
+  EmolaCobrancaFilter,
+  EmolaSession,
   Fee,
   KycSubmission,
   LedgerEntry,
@@ -50,6 +53,8 @@ interface DBData {
   notifications: Notification[];
   disputes: Dispute[];
   audit: AuditLog[];
+  emolaSessions: EmolaSession[];
+  emolaCobrancas: EmolaCobranca[];
 }
 
 const agora = () => new Date().toISOString();
@@ -156,6 +161,8 @@ function seed(): DBData {
     notifications: [],
     disputes: [],
     audit: [],
+    emolaSessions: [],
+    emolaCobrancas: [],
   };
 }
 
@@ -606,6 +613,56 @@ export class DemoStore implements DataStore {
   }
   async listDisputes() {
     return cloneList([...store().disputes].sort((a, b) => b.criado_em.localeCompare(a.criado_em)));
+  }
+
+  // ── e-Mola (gateway de cobrança directa) ──────────────────
+  async upsertEmolaSession(s: Omit<EmolaSession, "criado_em" | "atualizado_em">): Promise<EmolaSession> {
+    const db = store();
+    const existente = db.emolaSessions.find((x) => x.phone === s.phone);
+    if (existente) {
+      Object.assign(existente, s, { atualizado_em: agora() });
+      return clone(existente);
+    }
+    const row: EmolaSession = { ...s, criado_em: agora(), atualizado_em: agora() };
+    db.emolaSessions.push(row);
+    return clone(row);
+  }
+  async findEmolaSession(phone: string) {
+    const s = store().emolaSessions.find((x) => x.phone === phone);
+    return s ? clone(s) : null;
+  }
+  async updateEmolaSession(phone: string, patch: Partial<EmolaSession>) {
+    const s = store().emolaSessions.find((x) => x.phone === phone);
+    if (!s) return null;
+    Object.assign(s, patch, { phone: s.phone, atualizado_em: agora() });
+    return clone(s);
+  }
+  async deleteEmolaSession(phone: string) {
+    const db = store();
+    db.emolaSessions = db.emolaSessions.filter((s) => s.phone !== phone);
+  }
+
+  async insertEmolaCobranca(c: Omit<EmolaCobranca, "id" | "criado_em" | "concluido_em">): Promise<EmolaCobranca> {
+    const row: EmolaCobranca = { ...c, id: uuid(), criado_em: agora(), concluido_em: null };
+    store().emolaCobrancas.push(row);
+    return clone(row);
+  }
+  async findEmolaCobranca(id: string) {
+    const c = store().emolaCobrancas.find((x) => x.id === id);
+    return c ? clone(c) : null;
+  }
+  async updateEmolaCobranca(id: string, patch: Partial<EmolaCobranca>) {
+    const c = store().emolaCobrancas.find((x) => x.id === id);
+    if (!c) return null;
+    Object.assign(c, patch, { id: c.id });
+    return clone(c);
+  }
+  async listEmolaCobrancas(filter?: EmolaCobrancaFilter) {
+    let rows = [...store().emolaCobrancas];
+    if (filter?.status) rows = rows.filter((r) => r.status === filter.status);
+    if (filter?.tipo) rows = rows.filter((r) => r.tipo === filter.tipo);
+    rows.sort((a, b) => b.criado_em.localeCompare(a.criado_em));
+    return cloneList(filter?.limit ? rows.slice(0, filter.limit) : rows);
   }
 
   // ── Auditoria ──────────────────────────────────────────────

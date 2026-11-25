@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, ArrowDownToLine, ArrowUpRight, Store, CreditCard,
-  Layers, Percent, Plug2, BellRing, Scale, ScrollText, ShieldCheck,
+  Layers, Percent, Plug2, BellRing, Scale, ScrollText, ShieldCheck, Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Papel } from "@/lib/db/types";
@@ -43,6 +43,7 @@ export function AdminSidebar({ papel, depositosPendentes, levantamentosPendentes
     {
       titulo: "Sistema",
       itens: [
+        { href: "/admin/emola", label: "e-Mola (cobranças)", icon: Smartphone, permissao: "emola.gerir" },
         { href: "/admin/taxas", label: "Taxas & Câmbio", icon: Percent, permissao: "taxas.gerir" },
         { href: "/admin/integracoes", label: "Integrações", icon: Plug2, permissao: "integracoes.ver" },
         { href: "/admin/notificacoes", label: "Notificações", icon: BellRing, permissao: "notificacoes.ver" },

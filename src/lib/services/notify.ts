@@ -21,6 +21,7 @@ export type NotificacaoTipo =
   | "kyc_rejeitado"
   | "disputa_aberta"
   | "disputa_resolvida"
+  | "pagamento_emola"
   | "seguranca";
 
 export async function notificarInApp(userId: string, tipo: NotificacaoTipo, titulo: string, corpo: string) {
